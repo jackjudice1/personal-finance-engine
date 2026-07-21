@@ -1,15 +1,17 @@
 import type { FinancialProfile } from "@/types/financial";
 import type { FinancialPersonality } from "@/types/database.types";
 import type { ChatMessage } from "@/types/coach";
-import { calculateHealthScore } from "@/lib/engine/healthScore";
+import { calculateHealthScore, CASH_FLOW_TARGET_SAVINGS_RATE } from "@/lib/engine/healthScore";
 import { generateRecommendations } from "@/lib/engine/recommendations";
 import { debtVsInvesting } from "@/lib/simulators/debtVsInvesting";
+import { projectGoal } from "@/lib/engine/goalProjections";
 import { categorize } from "@/lib/coach/intentRouter";
 import { detectWhatIfScenario } from "@/lib/coach/whatIfScenarios";
 import { buildDecisionAnalysis, type PurchaseType } from "@/lib/coach/decisionAnalysis";
 import { getFollowUps } from "@/lib/coach/followUps";
 import { extractDollarAmount, extractMonthlyPayment } from "@/lib/coach/extract";
 import { PERSONALITY_MODES } from "@/lib/constants/personalityModes";
+import { EXPENSE_CATEGORY_LABELS } from "@/types/financial";
 import { formatCurrency, formatPercent } from "@/utils/formatters";
 
 function isAffordabilityQuestion(q: string) {
@@ -20,6 +22,30 @@ function isDebtVsInvestingQuestion(q: string) {
 }
 function isHealthScoreQuestion(q: string) {
   return /\b(health score|how am i doing|financial health|doing financially)\b/i.test(q);
+}
+function isEmergencyFundTimelineQuestion(q: string) {
+  return /\bemergency fund\b/i.test(q) && /\b(how long|when|goal)\b/i.test(q);
+}
+function isSubscriptionQuestion(q: string) {
+  return /\bsubscriptions?\b/i.test(q);
+}
+function isOverspendingQuestion(q: string) {
+  return /\boverspend/i.test(q);
+}
+function isSavingsAdviceQuestion(q: string) {
+  return /\b(how much should i save|how can i save|save (each|every|per) month)\b/i.test(q);
+}
+function isWhatsHurtingQuestion(q: string) {
+  return /\bhurting\b/i.test(q);
+}
+
+/** Largest non-zero expense category, or null if none logged. */
+function biggestExpenseCategory(profile: FinancialProfile): { label: string; amount: number } | null {
+  const [entry] = Object.entries(profile.expensesByCategory)
+    .filter(([, amount]) => amount > 0)
+    .sort((a, b) => b[1] - a[1]);
+  if (!entry) return null;
+  return { label: EXPENSE_CATEGORY_LABELS[entry[0] as keyof typeof EXPENSE_CATEGORY_LABELS], amount: entry[1] };
 }
 
 function extractPurchaseLabel(question: string, fallback: string): string {
@@ -170,10 +196,128 @@ export function answerCoachQuestion(
     };
   }
 
+  if (isEmergencyFundTimelineQuestion(q)) {
+    const efGoal = profile.goals.find((g) => g.type === "emergency_fund");
+    let content: string;
+    if (efGoal && efGoal.monthlyContribution > 0) {
+      const projection = projectGoal(efGoal);
+      content =
+        projection.monthsRemaining === 0
+          ? `You've already hit your **${efGoal.title}** target of ${formatCurrency(efGoal.targetAmount)}.`
+          : `At **${formatCurrency(efGoal.monthlyContribution)}/mo**, you'll reach your **${formatCurrency(
+              efGoal.targetAmount
+            )}** emergency fund goal in about **${projection.monthsRemaining} months** — you're currently at ${formatCurrency(
+              efGoal.currentAmount
+            )}.`;
+    } else if (efGoal) {
+      content = `You have an "${efGoal.title}" goal but no monthly contribution set for it — add one in Goals to get a timeline.`;
+    } else {
+      const health = calculateHealthScore(profile);
+      const detail = health.details.savings;
+      content = `You don't have a dedicated Emergency Fund goal set up, but based on your accounts you're at **${formatCurrency(
+        detail.currentValue
+      )}** of a **${formatCurrency(detail.targetValue)}** target (3 months of expenses). Add an Emergency Fund goal with a monthly contribution to get a precise timeline.`;
+    }
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
+  if (isSubscriptionQuestion(q)) {
+    const subs = profile.expensesByCategory.subscriptions ?? 0;
+    const pctOfIncome = profile.monthlyIncome > 0 ? subs / profile.monthlyIncome : 0;
+    const content =
+      subs === 0
+        ? `You haven't logged any subscription expenses — if you have any, add them in Settings so I can flag whether they're worth cutting.`
+        : `You're spending **${formatCurrency(subs)}/mo** (${formatPercent(pctOfIncome)} of income) on subscriptions. ${
+            pctOfIncome > 0.05
+              ? "That's a meaningful chunk of your income — worth reviewing your statement for anything you don't use weekly."
+              : "That's a reasonable share of your income — no obvious red flag there."
+          } I only track this as one lump category today, not individual subscriptions, so you'll need to check your bank/card statement for which specific ones to cancel.`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
+  if (isOverspendingQuestion(q)) {
+    const biggest = biggestExpenseCategory(profile);
+    const isOverspending = profile.savingsRate < 0.05;
+    const content = `${
+      isOverspending
+        ? `Yes — your savings rate is **${formatPercent(profile.savingsRate)}**, below a healthy 5% buffer.`
+        : `Not really — you're saving **${formatPercent(profile.savingsRate)}** of your income, which is healthy.`
+    }${biggest ? ` Your biggest expense category is **${biggest.label}** at ${formatCurrency(biggest.amount)}/mo.` : ""}`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
+  if (isSavingsAdviceQuestion(q)) {
+    const currentSurplus = profile.monthlyIncome - profile.monthlyExpenses;
+    const explicitTarget = extractDollarAmount(q);
+    let content: string;
+    if (explicitTarget) {
+      const gap = explicitTarget - currentSurplus;
+      content =
+        gap <= 0
+          ? `You're already saving **${formatCurrency(currentSurplus)}/mo**, which clears your ${formatCurrency(
+              explicitTarget
+            )} target.`
+          : `You're currently saving **${formatCurrency(currentSurplus)}/mo**. To hit **${formatCurrency(
+              explicitTarget
+            )}/mo**, you'd need to free up **${formatCurrency(gap)}** more — either cut expenses or increase income by that much.`;
+    } else {
+      const benchmarkAmount = profile.monthlyIncome * CASH_FLOW_TARGET_SAVINGS_RATE;
+      content =
+        currentSurplus >= benchmarkAmount
+          ? `A common benchmark is saving **${formatPercent(CASH_FLOW_TARGET_SAVINGS_RATE)}** of your income — for you that's **${formatCurrency(
+              benchmarkAmount
+            )}/mo**. You're already there, saving ${formatCurrency(currentSurplus)}/mo (${formatPercent(profile.savingsRate)}).`
+          : `A common benchmark is saving **${formatPercent(CASH_FLOW_TARGET_SAVINGS_RATE)}** of your income — for you that's **${formatCurrency(
+              benchmarkAmount
+            )}/mo**. You're currently at ${formatCurrency(currentSurplus)}/mo (${formatPercent(
+              profile.savingsRate
+            )}), about ${formatCurrency(benchmarkAmount - currentSurplus)} short of that.`;
+    }
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
   const [topRecommendation] = generateRecommendations(profile);
+
+  if (isWhatsHurtingQuestion(q)) {
+    const content = topRecommendation
+      ? `**${topRecommendation.title}** — ${topRecommendation.description}`
+      : `Nothing urgent stands out — your numbers look solid across the board right now.`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
   const content = topRecommendation
-    ? `I can help most with affordability questions, debt-vs-investing trade-offs, and your health score. In the meantime, your top recommendation right now:\n\n> ${topRecommendation.description}`
-    : `I can help with questions like "Can I afford a $30,000 car?", "Should I pay off debt or invest?", or "How's my financial health?" — ask me one of those.`;
+    ? `Your top recommendation right now: **${topRecommendation.title}** — ${topRecommendation.description}\n\nI can also help with affordability questions, debt-vs-investing trade-offs, your health score, savings targets, or a "what if" scenario.`
+    : `Nothing urgent stands out in your numbers right now. Try asking about affordability, debt vs. investing, your health score, savings targets, or a "what if" scenario.`;
 
   return {
     id: nextId(),

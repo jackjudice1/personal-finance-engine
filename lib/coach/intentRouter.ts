@@ -18,8 +18,8 @@ const CATEGORY_PATTERNS: { category: CoachCategory; pattern: RegExp }[] = [
   { category: "emergency_fund", pattern: /\b(emergency fund)\b/i },
   { category: "debt_payoff", pattern: /\b(pay off|payoff|debt)\b/i },
   { category: "investment_advice", pattern: /\b(invest|investing|stock|etf|portfolio)\b/i },
-  { category: "budgeting", pattern: /\b(budget|overspend|spending|subscriptions?|cut costs)\b/i },
-  { category: "cash_flow", pattern: /\b(cash flow|paycheck to paycheck)\b/i },
+  { category: "budgeting", pattern: /\b(budget|overspend(?:ing)?|spending|subscriptions?|cut costs|save|saving)\b/i },
+  { category: "cash_flow", pattern: /\b(cash flow|paycheck to paycheck|hurting)\b/i },
   { category: "large_purchase", pattern: /\b(afford|buy|purchase|get a)\b/i },
 ];
 

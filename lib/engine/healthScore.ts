@@ -15,7 +15,7 @@ export const HEALTH_SCORE_WEIGHTS = {
 } as const;
 
 /** Savings rate at which the cash flow sub-score hits 100. */
-const CASH_FLOW_TARGET_SAVINGS_RATE = 0.2;
+export const CASH_FLOW_TARGET_SAVINGS_RATE = 0.2;
 /** Multiplier applied to debt-to-income ratio before penalizing the debt score. */
 const DEBT_SCORE_PENALTY_MULTIPLIER = 300;
 /** Debt-to-income ratio shown to users as the "healthy" benchmark - a stricter, more legible number than the 33%+ point where the score formula bottoms out. */

@@ -2,7 +2,7 @@ import type { FinancialProfile } from "@/types/financial";
 import type { WhatIfInput, WhatIfProjectionPoint, WhatIfResult } from "@/types/engine";
 
 /** Assumed long-run nominal annual return for invested assets in projections. */
-const ASSUMED_ANNUAL_INVESTMENT_RETURN = 0.07;
+export const ASSUMED_ANNUAL_INVESTMENT_RETURN = 0.07;
 
 function project(
   profile: FinancialProfile,

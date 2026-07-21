@@ -25,7 +25,7 @@ const NAV_ITEMS = [
   { href: "/dashboard/news", label: "News", icon: Newspaper },
   { href: "/dashboard/recommendations", label: "Recommendations", icon: Sparkles },
   { href: "/dashboard/simulators", label: "Simulators", icon: Calculator },
-  { href: "/dashboard/assistant", label: "Assistant", icon: Bot },
+  { href: "/dashboard/assistant", label: "AI Coach", icon: Bot },
   { href: "/dashboard/achievements", label: "Achievements", icon: Trophy },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];

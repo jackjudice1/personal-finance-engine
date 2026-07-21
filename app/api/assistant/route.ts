@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { buildFinancialProfile } from "@/lib/engine/buildProfile";
-import { answerQuestion } from "@/lib/ai/assistant";
+import { answerCoachQuestion } from "@/lib/coach/answerCoachQuestion";
 
-const bodySchema = z.object({ question: z.string().min(1).max(500) });
+const bodySchema = z.object({
+  question: z.string().min(1).max(500),
+  personality: z.enum(["coach", "analyst", "minimal"]).optional(),
+});
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -40,7 +43,7 @@ export async function POST(request: Request) {
     stockHoldings: stockHoldingsRes.data ?? [],
   });
 
-  const answer = answerQuestion(parsed.data.question, profile);
+  const message = answerCoachQuestion(parsed.data.question, profile, parsed.data.personality);
 
-  return NextResponse.json({ answer });
+  return NextResponse.json({ message });
 }

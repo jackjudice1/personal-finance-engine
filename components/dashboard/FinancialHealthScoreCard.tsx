@@ -1,4 +1,6 @@
-import type { HealthScoreBreakdown } from "@/types/engine";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import type { HealthScoreBreakdown, HealthScoreSubKey } from "@/types/engine";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoTooltip } from "@/components/shared/InfoTooltip";
 import { cn } from "@/lib/utils";
@@ -6,7 +8,7 @@ import { cn } from "@/lib/utils";
 const OVERALL_SCORE_EXPLANATION =
   "The average of the four scores below (each worth 25%). It only moves as fast as your slowest-improving area — a great cash flow score can't make up for an empty emergency fund or no investments.";
 
-const SUB_SCORES: { key: keyof Omit<HealthScoreBreakdown, "overall">; label: string; explanation: string }[] = [
+const SUB_SCORES: { key: HealthScoreSubKey; label: string; explanation: string }[] = [
   {
     key: "cashFlow",
     label: "Cash Flow",
@@ -51,44 +53,66 @@ export function FinancialHealthScoreCard({ health }: { health: HealthScoreBreakd
           <InfoTooltip text={OVERALL_SCORE_EXPLANATION} />
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-6 sm:flex-row sm:items-center">
-        <div className="relative flex shrink-0 items-center justify-center">
-          <svg viewBox="0 0 100 100" className="size-28 -rotate-90">
-            <circle cx="50" cy="50" r="42" strokeWidth="8" className="fill-none stroke-muted" />
-            <circle
-              cx="50"
-              cy="50"
-              r="42"
-              strokeWidth="8"
-              strokeLinecap="round"
-              className={cn("fill-none transition-all", scoreColor(health.overall).replace("bg-", "stroke-"))}
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
-            />
-          </svg>
-          <div className="absolute flex flex-col items-center">
-            <span className="text-3xl font-semibold tabular-nums">{health.overall}</span>
-            <span className="text-[11px] text-muted-foreground">/ 100</span>
-          </div>
-        </div>
-        <div className="flex-1 space-y-3">
-          {SUB_SCORES.map((sub) => (
-            <div key={sub.key} className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1 text-muted-foreground">
-                  {sub.label}
-                  <InfoTooltip text={sub.explanation} />
-                </span>
-                <span className="font-medium tabular-nums">{health[sub.key]}</span>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className={cn("h-full rounded-full transition-all", scoreColor(health[sub.key]))}
-                  style={{ width: `${health[sub.key]}%` }}
-                />
-              </div>
+      <CardContent className="space-y-6">
+        <div className="flex items-center gap-5">
+          <div className="relative flex shrink-0 items-center justify-center">
+            <svg viewBox="0 0 100 100" className="size-24 -rotate-90">
+              <circle cx="50" cy="50" r="42" strokeWidth="8" className="fill-none stroke-muted" />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                strokeWidth="8"
+                strokeLinecap="round"
+                className={cn("fill-none transition-all", scoreColor(health.overall).replace("bg-", "stroke-"))}
+                strokeDasharray={circumference}
+                strokeDashoffset={offset}
+              />
+            </svg>
+            <div className="absolute flex flex-col items-center">
+              <span className="text-2xl font-semibold tabular-nums">{health.overall}</span>
+              <span className="text-[11px] text-muted-foreground">/ 100</span>
             </div>
-          ))}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Weighted equally across cash flow, debt, savings, and investing. Each row below shows your real numbers,
+            not just the score.
+          </p>
+        </div>
+
+        <div className="space-y-5">
+          {SUB_SCORES.map((sub) => {
+            const detail = health.details[sub.key];
+            return (
+              <div key={sub.key} className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-1 font-medium">
+                    {sub.label}
+                    <InfoTooltip text={sub.explanation} />
+                  </span>
+                  <span className="font-medium tabular-nums">{detail.score}</span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className={cn("h-full rounded-full transition-all", scoreColor(detail.score))}
+                    style={{ width: `${detail.score}%` }}
+                  />
+                </div>
+                <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+                  <p className="text-xs text-muted-foreground">{detail.why}</p>
+                  {detail.action && (
+                    <Link
+                      href={detail.action.href}
+                      className="inline-flex shrink-0 items-center gap-0.5 text-xs font-medium text-primary hover:underline"
+                    >
+                      {detail.action.label}
+                      <ArrowRight className="size-3" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>

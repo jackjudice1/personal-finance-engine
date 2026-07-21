@@ -10,12 +10,33 @@ export interface Recommendation {
   relatedGoalId?: string;
 }
 
+export type HealthScoreSubKey = "cashFlow" | "debt" | "savings" | "investment";
+
+export interface HealthScoreSubDetail {
+  score: number;
+  /** Raw current value behind the score, e.g. a savings rate or a dollar balance. */
+  currentValue: number;
+  /** Raw target value for a perfect (100) score, in the same unit as currentValue. */
+  targetValue: number;
+  format: "percent" | "currency";
+  /** Plain-language sentence stating where the user stands, using real numbers. */
+  why: string;
+  /** Present only when the score is below 100 - there's nothing to "fix" at 100. */
+  action: { label: string; href: string } | null;
+}
+
 export interface HealthScoreBreakdown {
   overall: number;
   cashFlow: number;
   debt: number;
   savings: number;
   investment: number;
+  details: Record<HealthScoreSubKey, HealthScoreSubDetail>;
+}
+
+export interface HealthScoreHistoryPoint {
+  date: string;
+  overall: number;
 }
 
 export interface NetWorthSummary {

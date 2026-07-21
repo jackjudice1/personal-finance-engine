@@ -6,11 +6,13 @@ import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { useHealthScore } from "@/hooks/useHealthScore";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { useNetWorthHistory } from "@/hooks/useNetWorthHistory";
+import { useHealthScoreHistory } from "@/hooks/useHealthScoreHistory";
 import { useUserLevel } from "@/hooks/useUserLevel";
 import { useAchievements } from "@/hooks/useAchievements";
 import { useWidgetPreferences } from "@/hooks/useWidgetPreferences";
 import { FinancialHealthScoreCard } from "@/components/dashboard/FinancialHealthScoreCard";
 import { NetWorthChart } from "@/components/dashboard/NetWorthChart";
+import { HealthScoreTrendChart } from "@/components/dashboard/HealthScoreTrendChart";
 import { MoneySnapshotGrid } from "@/components/dashboard/MoneySnapshotGrid";
 import { RecommendationFeed } from "@/components/dashboard/RecommendationFeed";
 import { LevelUpToast } from "@/components/gamification/LevelUpToast";
@@ -22,6 +24,7 @@ export default function DashboardPage() {
   const health = useHealthScore(profile);
   const recommendations = useRecommendations(profile);
   const { history } = useNetWorthHistory(profile);
+  const { history: healthScoreHistory } = useHealthScoreHistory(health);
   const { level, leveledUp } = useUserLevel(profile, health);
   const { newlyUnlocked } = useAchievements(profile, health);
   const { preferences } = useWidgetPreferences();
@@ -45,10 +48,14 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {preferences.healthScore && <FinancialHealthScoreCard health={health} />}
+
       {(preferences.healthScore || preferences.netWorth) && (
         <div className="grid gap-4 lg:grid-cols-2">
-          {preferences.healthScore && <FinancialHealthScoreCard health={health} />}
           {preferences.netWorth && <NetWorthChart history={history} netWorth={netWorth} />}
+          {preferences.healthScore && (
+            <HealthScoreTrendChart history={healthScoreHistory} overall={health.overall} />
+          )}
         </div>
       )}
 

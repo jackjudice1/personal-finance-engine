@@ -282,6 +282,29 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["net_worth_snapshots"]["Row"]>;
         Relationships: [];
       };
+      health_score_snapshots: {
+        Row: {
+          id: string;
+          user_id: string;
+          snapshot_date: string;
+          overall_score: number;
+          cash_flow_score: number;
+          debt_score: number;
+          savings_score: number;
+          investment_score: number;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["health_score_snapshots"]["Row"]> & {
+          user_id: string;
+          overall_score: number;
+          cash_flow_score: number;
+          debt_score: number;
+          savings_score: number;
+          investment_score: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["health_score_snapshots"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

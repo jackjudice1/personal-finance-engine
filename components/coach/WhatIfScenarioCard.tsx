@@ -24,7 +24,12 @@ export function WhatIfScenarioCard({ scenario, profile }: { scenario: WhatIfScen
     step: s.step,
     value: values[s.key],
     onChange: (value) => setValues((prev) => ({ ...prev, [s.key]: value })),
-    format: s.format === "years" ? (v) => `${v} yr` : (v) => `${v >= 0 ? "+" : ""}${formatCurrency(v)}`,
+    format:
+      s.format === "years"
+        ? (v) => `${v} yr`
+        : s.baseline !== undefined
+          ? (v) => formatCurrency(s.baseline! + v)
+          : (v) => `${v >= 0 ? "+" : ""}${formatCurrency(v)}`,
   }));
 
   const chartData = result.projection.map((point) => ({ year: point.year, "This scenario": point.netWorth }));

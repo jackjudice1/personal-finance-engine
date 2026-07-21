@@ -70,13 +70,21 @@ export type WhatIfScenarioType =
   | "move_cities";
 
 export interface WhatIfSliderDef {
-  key: "monthlyIncomeDelta" | "monthlyExpensesDelta" | "extraMonthlyInvestment" | "extraMonthlyDebtPayment" | "horizonYears";
+  key:
+    | "monthlyIncomeDelta"
+    | "annualIncomeDelta"
+    | "monthlyExpensesDelta"
+    | "extraMonthlyInvestment"
+    | "extraMonthlyDebtPayment"
+    | "horizonYears";
   label: string;
   min: number;
   max: number;
   step: number;
   default: number;
   format: "currency" | "years";
+  /** When set, the slider displays baseline + value (your real current number) instead of a bare "+delta". */
+  baseline?: number;
 }
 
 export interface WhatIfScenarioConfig {

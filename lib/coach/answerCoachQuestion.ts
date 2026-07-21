@@ -90,7 +90,7 @@ export function answerCoachQuestion(
   const q = question.trim();
   const category = categorize(q);
 
-  const whatIfScenario = detectWhatIfScenario(q);
+  const whatIfScenario = detectWhatIfScenario(q, profile);
   if (whatIfScenario) {
     return {
       id: nextId(),

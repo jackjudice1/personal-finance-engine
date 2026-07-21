@@ -4,6 +4,9 @@ import type { WhatIfInput, WhatIfResult } from "@/types/engine";
 import { whatIf } from "@/lib/simulators/whatIf";
 import { extractDollarAmount } from "@/lib/coach/extract";
 
+/** Generous headroom above your current annual income so the slider can reach a meaningfully higher salary. */
+const INCOME_HEADROOM = 300000;
+
 const DEFAULT_HORIZON: WhatIfSliderDef = {
   key: "horizonYears",
   label: "Time horizon",
@@ -14,34 +17,48 @@ const DEFAULT_HORIZON: WhatIfSliderDef = {
   format: "years",
 };
 
-const SCENARIO_CONFIG: Record<WhatIfScenarioType, (question: string) => WhatIfScenarioConfig> = {
-  salary_increase: (question) => {
-    const annualRaise = extractDollarAmount(question);
+const SCENARIO_CONFIG: Record<WhatIfScenarioType, (question: string, profile: FinancialProfile) => WhatIfScenarioConfig> = {
+  salary_increase: (question, profile) => {
+    const annualIncome = Math.round(profile.monthlyIncome * 12);
+    const explicitRaise = extractDollarAmount(question);
     return {
       type: "salary_increase",
       title: "What if you got a raise?",
       sliders: [
         {
-          key: "monthlyIncomeDelta",
-          label: "Monthly income increase",
-          min: 0,
-          max: 5000,
-          step: 50,
-          default: annualRaise ? Math.round(annualRaise / 12) : 500,
+          key: "annualIncomeDelta",
+          label: "Annual income",
+          min: -annualIncome,
+          max: INCOME_HEADROOM,
+          step: 100,
+          default: explicitRaise ?? 0,
           format: "currency",
+          baseline: annualIncome,
         },
         DEFAULT_HORIZON,
       ],
     };
   },
-  lower_rent: () => ({
-    type: "lower_rent",
-    title: "What if you lowered your rent?",
-    sliders: [
-      { key: "monthlyExpensesDelta", label: "Monthly rent change", min: -2000, max: 0, step: 50, default: -300, format: "currency" },
-      DEFAULT_HORIZON,
-    ],
-  }),
+  lower_rent: (_question, profile) => {
+    const monthlyExpenses = Math.round(profile.monthlyExpenses);
+    return {
+      type: "lower_rent",
+      title: "What if you lowered your rent?",
+      sliders: [
+        {
+          key: "monthlyExpensesDelta",
+          label: "Monthly expenses",
+          min: -monthlyExpenses,
+          max: 0,
+          step: 100,
+          default: -300,
+          format: "currency",
+          baseline: monthlyExpenses,
+        },
+        DEFAULT_HORIZON,
+      ],
+    };
+  },
   invest_more: () => ({
     type: "invest_more",
     title: "What if you invested more?",
@@ -109,23 +126,24 @@ const SCENARIO_KEYWORDS: { type: WhatIfScenarioType; pattern: RegExp }[] = [
 const WHAT_IF_PHRASING = /\bwhat\s+(?:\w+\s+){0,3}if\b/i;
 
 /** Only triggers on explicit "what if"-style phrasing, paired with a recognized scenario keyword. */
-export function detectWhatIfScenario(question: string): WhatIfScenarioConfig | null {
+export function detectWhatIfScenario(question: string, profile: FinancialProfile): WhatIfScenarioConfig | null {
   if (!WHAT_IF_PHRASING.test(question)) return null;
 
   for (const { type, pattern } of SCENARIO_KEYWORDS) {
-    if (pattern.test(question)) return SCENARIO_CONFIG[type](question);
+    if (pattern.test(question)) return SCENARIO_CONFIG[type](question, profile);
   }
   return null;
 }
 
-/** Bridges the scenario's slider state to the existing whatIf() simulator, defaulting every unused lever to 0/no-op. */
+/** Bridges the scenario's slider state to the existing whatIf() simulator. annualIncomeDelta (a synthetic, UI-only unit) is converted to the monthly delta whatIf() expects. */
 export function runWhatIfScenario(
   config: WhatIfScenarioConfig,
   sliderValues: Record<string, number>,
   profile: FinancialProfile
 ): WhatIfResult {
+  const annualIncomeDelta = sliderValues.annualIncomeDelta;
   const input: WhatIfInput = {
-    monthlyIncomeDelta: sliderValues.monthlyIncomeDelta ?? 0,
+    monthlyIncomeDelta: annualIncomeDelta !== undefined ? annualIncomeDelta / 12 : sliderValues.monthlyIncomeDelta ?? 0,
     monthlyExpensesDelta: sliderValues.monthlyExpensesDelta ?? 0,
     extraMonthlyInvestment: sliderValues.extraMonthlyInvestment ?? 0,
     extraMonthlyDebtPayment: sliderValues.extraMonthlyDebtPayment ?? 0,

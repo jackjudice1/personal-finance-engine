@@ -8,8 +8,16 @@ import { SimulatorSliderPanel, type SliderConfig } from "@/components/simulators
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCompactCurrency, formatCurrency } from "@/utils/formatters";
 
+/** Generous headroom above your current annual income so the slider can reach a meaningfully higher salary. */
+const INCOME_HEADROOM = 300000;
+/** Generous headroom above your current monthly expenses. */
+const EXPENSE_HEADROOM = 5000;
+
 export function WhatIfSimulator({ profile }: { profile: FinancialProfile }) {
-  const [monthlyIncomeDelta, setMonthlyIncomeDelta] = useState(0);
+  const annualIncome = Math.round(profile.monthlyIncome * 12);
+  const monthlyExpenses = Math.round(profile.monthlyExpenses);
+
+  const [annualIncomeDelta, setAnnualIncomeDelta] = useState(0);
   const [monthlyExpensesDelta, setMonthlyExpensesDelta] = useState(0);
   const [extraMonthlyInvestment, setExtraMonthlyInvestment] = useState(200);
   const [extraMonthlyDebtPayment, setExtraMonthlyDebtPayment] = useState(0);
@@ -18,32 +26,38 @@ export function WhatIfSimulator({ profile }: { profile: FinancialProfile }) {
   const result = useMemo(
     () =>
       whatIf(
-        { monthlyIncomeDelta, monthlyExpensesDelta, extraMonthlyInvestment, extraMonthlyDebtPayment, horizonYears },
+        {
+          monthlyIncomeDelta: annualIncomeDelta / 12,
+          monthlyExpensesDelta,
+          extraMonthlyInvestment,
+          extraMonthlyDebtPayment,
+          horizonYears,
+        },
         profile
       ),
-    [monthlyIncomeDelta, monthlyExpensesDelta, extraMonthlyInvestment, extraMonthlyDebtPayment, horizonYears, profile]
+    [annualIncomeDelta, monthlyExpensesDelta, extraMonthlyInvestment, extraMonthlyDebtPayment, horizonYears, profile]
   );
 
   const sliders: SliderConfig[] = [
     {
-      key: "monthlyIncomeDelta",
-      label: "Monthly income change",
-      min: -2000,
-      max: 5000,
+      key: "annualIncomeDelta",
+      label: "Annual income",
+      min: -annualIncome,
+      max: INCOME_HEADROOM,
       step: 100,
-      value: monthlyIncomeDelta,
-      onChange: setMonthlyIncomeDelta,
-      format: (v) => `${v >= 0 ? "+" : ""}${formatCurrency(v)}`,
+      value: annualIncomeDelta,
+      onChange: setAnnualIncomeDelta,
+      format: (v) => formatCurrency(annualIncome + v),
     },
     {
       key: "monthlyExpensesDelta",
-      label: "Monthly expenses change",
-      min: -2000,
-      max: 3000,
+      label: "Monthly expenses",
+      min: -monthlyExpenses,
+      max: EXPENSE_HEADROOM,
       step: 100,
       value: monthlyExpensesDelta,
       onChange: setMonthlyExpensesDelta,
-      format: (v) => `${v >= 0 ? "+" : ""}${formatCurrency(v)}`,
+      format: (v) => formatCurrency(monthlyExpenses + v),
     },
     {
       key: "extraMonthlyInvestment",

@@ -101,8 +101,8 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-base font-medium text-foreground">Contact</h2>
           <p>
             Questions about this policy? Email{" "}
-            <a href="mailto:[insert contact email]" className="underline underline-offset-4">
-              [insert contact email]
+            <a href="mailto:jackjudice1@gmail.com" className="underline underline-offset-4">
+              jackjudice1@gmail.com
             </a>
             .
           </p>

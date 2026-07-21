@@ -77,8 +77,8 @@ export default function PrivacyPolicyPage() {
           <p>
             You can edit or delete any financial info you&apos;ve entered directly in the app at any time. To
             request full account deletion, email us at{" "}
-            <a href="mailto:[insert contact email]" className="underline underline-offset-4">
-              [insert contact email]
+            <a href="mailto:jackjudice1@gmail.com" className="underline underline-offset-4">
+              jackjudice1@gmail.com
             </a>{" "}
             and we&apos;ll remove your account and associated data.
           </p>

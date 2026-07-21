@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Bot,
   Calculator,
+  CreditCard,
   LayoutDashboard,
   Newspaper,
   Settings,
@@ -19,6 +20,7 @@ import { SummitLogo } from "@/components/shared/SummitLogo";
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/goals", label: "Goals", icon: Target },
+  { href: "/dashboard/debts", label: "Debts", icon: CreditCard },
   { href: "/dashboard/investing", label: "Investing", icon: TrendingUp },
   { href: "/dashboard/news", label: "News", icon: Newspaper },
   { href: "/dashboard/recommendations", label: "Recommendations", icon: Sparkles },

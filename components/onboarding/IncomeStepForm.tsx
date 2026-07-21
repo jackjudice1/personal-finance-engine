@@ -62,7 +62,7 @@ export function IncomeStepForm() {
                     render={({ field: f }) => (
                       <Select value={f.value} onValueChange={f.onChange}>
                         <SelectTrigger className="w-full">
-                          <SelectValue />
+                          <SelectValue>{(value: string) => FREQUENCY_LABELS[value as keyof typeof FREQUENCY_LABELS]}</SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {Object.entries(FREQUENCY_LABELS).map(([value, label]) => (

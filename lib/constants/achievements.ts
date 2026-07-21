@@ -13,7 +13,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: "Debt Destroyer",
     description: "You've paid off a debt in full.",
     icon: "Swords",
-    predicate: (profile) => profile.liabilities.length === 0 && profile.totalLiabilities === 0,
+    predicate: (profile) => profile.liabilities.some((l) => l.balance === 0),
   },
   {
     key: "first_investment",

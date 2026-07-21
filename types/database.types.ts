@@ -327,12 +327,35 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["stock_holdings"]["Row"]>;
         Relationships: [];
       };
+      debt_payments: {
+        Row: {
+          id: string;
+          user_id: string;
+          liability_id: string;
+          amount: number;
+          balance_after: number;
+          paid_at: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["debt_payments"]["Row"]> & {
+          user_id: string;
+          liability_id: string;
+          amount: number;
+          balance_after: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["debt_payments"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
       get_financial_profile: {
         Args: { p_user_id: string };
         Returns: Json;
+      };
+      log_debt_payment: {
+        Args: { p_liability_id: string; p_amount: number; p_paid_at?: string };
+        Returns: Database["public"]["Tables"]["liabilities"]["Row"];
       };
     };
     Enums: Record<string, never>;

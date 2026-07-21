@@ -49,7 +49,7 @@ export function GoalForm({
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger className="w-full">
-                  <SelectValue />
+                  <SelectValue>{(value: string) => GOAL_TYPE_LABELS[value as keyof typeof GOAL_TYPE_LABELS]}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {Object.entries(GOAL_TYPE_LABELS).map(([value, label]) => (

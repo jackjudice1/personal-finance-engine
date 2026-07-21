@@ -65,7 +65,9 @@ export function DebtStepForm() {
                       render={({ field: f }) => (
                         <Select value={f.value} onValueChange={f.onChange}>
                           <SelectTrigger className="w-full">
-                            <SelectValue />
+                            <SelectValue>
+                              {(value: string) => LIABILITY_TYPE_LABELS[value as keyof typeof LIABILITY_TYPE_LABELS]}
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
                             {Object.entries(LIABILITY_TYPE_LABELS).map(([value, label]) => (

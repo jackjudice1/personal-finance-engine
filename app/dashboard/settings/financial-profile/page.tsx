@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Trash2 } from "lucide-react";
 import { useIncomeSources } from "@/hooks/useIncomeSources";
 import { useExpenses } from "@/hooks/useExpenses";
-import { useLiabilities } from "@/hooks/useLiabilities";
 import { useAssets } from "@/hooks/useAssets";
-import { EXPENSE_CATEGORY_LABELS, ASSET_TYPE_LABELS, LIABILITY_TYPE_LABELS } from "@/types/financial";
+import { EXPENSE_CATEGORY_LABELS, ASSET_TYPE_LABELS } from "@/types/financial";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,7 +96,9 @@ function ExpensesSection() {
         <div className="flex gap-2">
           <Select value={category} onValueChange={(v) => setCategory(v as keyof typeof EXPENSE_CATEGORY_LABELS)}>
             <SelectTrigger className="w-40">
-              <SelectValue />
+              <SelectValue>
+                {(value: string) => EXPENSE_CATEGORY_LABELS[value as keyof typeof EXPENSE_CATEGORY_LABELS]}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {Object.entries(EXPENSE_CATEGORY_LABELS).map(([value, l]) => (
@@ -114,68 +116,6 @@ function ExpensesSection() {
               if (amount > 0) {
                 add(category, amount);
                 setAmount(0);
-              }
-            }}
-          >
-            Add
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function DebtSection() {
-  const { items, isLoading, add, remove } = useLiabilities();
-  const [type, setType] = useState<keyof typeof LIABILITY_TYPE_LABELS>("credit_card");
-  const [label, setLabel] = useState("");
-  const [balance, setBalance] = useState(0);
-  const [rate, setRate] = useState(0);
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Debt</CardTitle>
-        <CardDescription>Credit cards, loans, mortgages.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {isLoading ? (
-          <Skeleton className="h-16" />
-        ) : (
-          items.map((l) => (
-            <Row
-              key={l.id}
-              label={l.label}
-              sub={`${formatCurrency(l.balance)} at ${l.interestRate}% APR`}
-              onDelete={() => remove(l.id)}
-            />
-          ))
-        )}
-        <div className="flex flex-wrap gap-2">
-          <Select value={type} onValueChange={(v) => setType(v as keyof typeof LIABILITY_TYPE_LABELS)}>
-            <SelectTrigger className="w-36">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(LIABILITY_TYPE_LABELS).map(([value, l]) => (
-                <SelectItem key={value} value={value}>
-                  {l}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input placeholder="Name" className="w-28" value={label} onChange={(e) => setLabel(e.target.value)} />
-          <Input type="number" placeholder="Balance" className="w-28" value={balance || ""} onChange={(e) => setBalance(Number(e.target.value))} />
-          <Input type="number" placeholder="APR %" className="w-24" value={rate || ""} onChange={(e) => setRate(Number(e.target.value))} />
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              if (label && balance > 0) {
-                add(type, label, balance, rate, 0);
-                setLabel("");
-                setBalance(0);
-                setRate(0);
               }
             }}
           >
@@ -215,7 +155,7 @@ function AssetsSection() {
         <div className="flex flex-wrap gap-2">
           <Select value={type} onValueChange={(v) => setType(v as keyof typeof ASSET_TYPE_LABELS)}>
             <SelectTrigger className="w-36">
-              <SelectValue />
+              <SelectValue>{(value: string) => ASSET_TYPE_LABELS[value as keyof typeof ASSET_TYPE_LABELS]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {Object.entries(ASSET_TYPE_LABELS).map(([value, l]) => (
@@ -255,8 +195,17 @@ export default function FinancialProfilePage() {
       </div>
       <IncomeSection />
       <ExpensesSection />
-      <DebtSection />
       <AssetsSection />
+      <Link
+        href="/dashboard/debts"
+        className="flex items-center justify-between rounded-xl border border-border/60 px-4 py-3 text-sm transition-colors hover:border-primary/50"
+      >
+        <span>
+          <span className="font-medium">Looking for debts?</span>{" "}
+          <span className="text-muted-foreground">They now have their own tab, with payment tracking.</span>
+        </span>
+        <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+      </Link>
     </div>
   );
 }

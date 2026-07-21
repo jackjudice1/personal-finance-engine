@@ -21,7 +21,7 @@ This app's schema lives entirely as SQL files in `database/migrations/`. Nothing
 
 **Option A — Supabase SQL editor (fastest, no CLI install):**
 
-Open the SQL editor in your project dashboard and run each file in `database/migrations/` **in order** (0001 through 0014), pasting and executing one at a time.
+Open the SQL editor in your project dashboard and run each file in `database/migrations/` **in order** (0001 through 0015), pasting and executing one at a time.
 
 **Option B — Supabase CLI:**
 
@@ -67,5 +67,6 @@ After signing up for an account through the running app (`/signup`), you can see
 | `net_worth_snapshots` | One row per user per day, upserted on dashboard load, powers the net worth trend chart. |
 | `health_score_snapshots` | One row per user per day, upserted on dashboard load, powers the Financial Health Score trend chart. |
 | `stock_holdings` | One row per user per ticker (adding the same ticker again merges shares/cost basis). Current price is cached from Finnhub, refreshed via `/dashboard/investing`'s "Refresh prices" button. |
+| `debt_payments` | One row per logged payment toward a debt, written via the `log_debt_payment()` function alongside decreasing the liability's balance. Powers the per-debt payoff chart on `/dashboard/debts`. |
 
 Every user-owned table has row-level security enabled (`database/migrations/0011_rls_policies.sql`) scoped to `auth.uid() = user_id`, so users can only ever see their own data — this holds even if application code has a bug, since it's enforced by Postgres itself.

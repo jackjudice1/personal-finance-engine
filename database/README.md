@@ -21,7 +21,7 @@ This app's schema lives entirely as SQL files in `database/migrations/`. Nothing
 
 **Option A — Supabase SQL editor (fastest, no CLI install):**
 
-Open the SQL editor in your project dashboard and run each file in `database/migrations/` **in order** (0001 through 0015), pasting and executing one at a time.
+Open the SQL editor in your project dashboard and run each file in `database/migrations/` **in order** (0001 through 0016), pasting and executing one at a time.
 
 **Option B — Supabase CLI:**
 

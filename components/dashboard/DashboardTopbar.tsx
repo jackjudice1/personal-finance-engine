@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -55,16 +56,18 @@ export function DashboardTopbar() {
             }
           />
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel className="truncate">{user?.email}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem render={<Link href="/dashboard/settings" />}>
-              <Settings className="size-4" />
-              Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleLogout} variant="destructive">
-              <LogOut className="size-4" />
-              Log out
-            </DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="truncate">{user?.email}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem render={<Link href="/dashboard/settings" />}>
+                <Settings className="size-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout} variant="destructive">
+                <LogOut className="size-4" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

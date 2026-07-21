@@ -2,7 +2,6 @@
 
 import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { WhatIfSimulator } from "@/components/simulators/WhatIfSimulator";
-import { PremiumGateOverlay } from "@/components/billing/PremiumGateOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function WhatIfPage() {
@@ -16,16 +15,7 @@ export default function WhatIfPage() {
           Adjust your income, expenses, and contributions to see your projected net worth change.
         </p>
       </div>
-      {isLoading || !profile ? (
-        <Skeleton className="h-96" />
-      ) : (
-        <PremiumGateOverlay
-          title="What-If Simulator is a Premium feature"
-          description="Upgrade to model long-range wealth projections."
-        >
-          <WhatIfSimulator profile={profile} />
-        </PremiumGateOverlay>
-      )}
+      {isLoading || !profile ? <Skeleton className="h-96" /> : <WhatIfSimulator profile={profile} />}
     </div>
   );
 }

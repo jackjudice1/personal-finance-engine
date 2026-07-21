@@ -3,7 +3,6 @@
 import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { useHealthScore } from "@/hooks/useHealthScore";
 import { CoachChatWindow } from "@/components/coach/CoachChatWindow";
-import { PremiumGateOverlay } from "@/components/billing/PremiumGateOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CoachPage() {
@@ -30,11 +29,7 @@ export default function CoachPage() {
         </div>
       )}
 
-      {!error && profile && health && (
-        <PremiumGateOverlay title="AI Financial Coach is a Premium feature" description="Upgrade to ask unlimited questions.">
-          <CoachChatWindow profile={profile} health={health} />
-        </PremiumGateOverlay>
-      )}
+      {!error && profile && health && <CoachChatWindow profile={profile} health={health} />}
     </div>
   );
 }

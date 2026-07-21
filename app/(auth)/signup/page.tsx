@@ -20,6 +20,17 @@ export default function SignupPage() {
             Log in
           </Link>
         </p>
+        <p className="text-center text-xs text-muted-foreground">
+          By signing up, you agree to Summit&apos;s{" "}
+          <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="underline underline-offset-4 hover:text-foreground">
+            Privacy Policy
+          </Link>
+          .
+        </p>
       </CardContent>
     </Card>
   );

@@ -11,6 +11,10 @@ const FOOTER_LINKS = {
     { href: "/signup", label: "Sign up" },
     { href: "/login", label: "Log in" },
   ],
+  Legal: [
+    { href: "/terms", label: "Terms of Service" },
+    { href: "/privacy", label: "Privacy Policy" },
+  ],
 };
 
 export function SiteFooter() {
@@ -29,7 +33,7 @@ export function SiteFooter() {
               Your money. Your goals. Your next best decision.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-10 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
             {Object.entries(FOOTER_LINKS).map(([heading, links]) => (
               <div key={heading} className="space-y-3">
                 <h3 className="text-sm font-medium">{heading}</h3>
@@ -47,8 +51,16 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-10 border-t border-border/60 pt-6 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Summit. Not a registered investment advisor —
-          recommendations are educational, not financial advice.
+          © {new Date().getFullYear()} Summit. Not a registered investment advisor — recommendations are
+          educational, not financial advice. See our{" "}
+          <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="underline underline-offset-4 hover:text-foreground">
+            Privacy Policy
+          </Link>
+          .
         </div>
       </div>
     </footer>

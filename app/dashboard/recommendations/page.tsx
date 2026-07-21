@@ -3,6 +3,7 @@
 import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { RecommendationFeed } from "@/components/dashboard/RecommendationFeed";
+import { FinancialDisclaimerBanner } from "@/components/shared/FinancialDisclaimerBanner";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function RecommendationsPage() {
@@ -17,6 +18,7 @@ export default function RecommendationsPage() {
           Every suggestion the decision engine has for your current numbers, ranked by urgency.
         </p>
       </div>
+      <FinancialDisclaimerBanner />
       {isLoading ? (
         <div className="space-y-3">
           <Skeleton className="h-20" />

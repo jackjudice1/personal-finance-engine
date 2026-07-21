@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Calculator, ShoppingCart, Sliders } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FinancialDisclaimerBanner } from "@/components/shared/FinancialDisclaimerBanner";
 
 const SIMULATORS = [
   {
@@ -30,6 +31,7 @@ export default function SimulatorsHubPage() {
         <h1 className="text-xl font-semibold">Simulators</h1>
         <p className="text-sm text-muted-foreground">Test decisions before you make them.</p>
       </div>
+      <FinancialDisclaimerBanner />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {SIMULATORS.map((sim) => (
           <Link key={sim.href} href={sim.href}>

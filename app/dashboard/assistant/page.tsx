@@ -3,6 +3,7 @@
 import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { useHealthScore } from "@/hooks/useHealthScore";
 import { CoachChatWindow } from "@/components/coach/CoachChatWindow";
+import { FinancialDisclaimerBanner } from "@/components/shared/FinancialDisclaimerBanner";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CoachPage() {
@@ -15,6 +16,8 @@ export default function CoachPage() {
         <h1 className="text-xl font-semibold">AI Financial Coach</h1>
         <p className="text-sm text-muted-foreground">Ask anything about your finances.</p>
       </div>
+
+      <FinancialDisclaimerBanner />
 
       {error && <p className="text-sm text-destructive">Couldn&apos;t load your financial profile: {error}</p>}
 

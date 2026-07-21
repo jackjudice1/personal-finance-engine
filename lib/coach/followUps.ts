@@ -1,21 +1,33 @@
 import type { CoachCategory } from "@/types/coach";
 
+/**
+ * Every phrase here is hand-verified to trigger a real, grounded handler in
+ * answerCoachQuestion.ts (not the generic top-recommendation fallback) - the
+ * engine has no memory between messages, so a vague follow-up like "show me
+ * the numbers" or "how does this affect retirement?" can't be answered
+ * meaningfully without context, and would otherwise just repeat the same
+ * fallback recommendation every time.
+ */
 const FOLLOW_UPS: Record<CoachCategory, string[]> = {
-  investment_advice: ["What if I invest more?", "How risky is that?", "Show me the numbers"],
-  debt_payoff: ["What if I paid off debt faster?", "Should I invest instead?", "Create a payoff plan"],
-  retirement: ["What if I contributed more?", "Am I on track?", "Show me the numbers"],
-  budgeting: ["What subscriptions should I cancel?", "How can I save $500/month?", "Show my spending breakdown"],
-  emergency_fund: ["How long until I reach my goal?", "What if I saved more each month?", "Is 3 months enough?"],
-  taxes: ["What else can I deduct?", "How does this affect next year?", "Show me the numbers"],
-  credit_score: ["What's hurting my score most?", "How long will this take?", "What should I do first?"],
-  home_buying: ["What if I waited a year?", "Show me the numbers", "How much house can I afford?"],
-  car_buying: ["What if I waited a year?", "Show me the numbers", "What about a cheaper model?"],
-  large_purchase: ["What if I wait a year?", "Show me the numbers", "Create a savings plan"],
-  salary_negotiation: ["What if I got a bigger raise?", "How should I counter?", "Show me the numbers"],
-  career_decisions: ["What if I took the new job?", "How does this affect retirement?", "Show me the numbers"],
-  college_savings: ["What if I saved more each month?", "Am I on track?", "Show me the numbers"],
-  insurance: ["Am I over-insured?", "What should I shop around for?", "Show me the numbers"],
-  cash_flow: ["What's hurting my finances most?", "How can I save $500/month?", "Show my spending breakdown"],
+  investment_advice: ["What if I invested more?", "How's my retirement looking?", "Am I overspending?"],
+  debt_payoff: ["What if I paid off debt faster?", "Should I pay off debt or invest?", "Am I overspending?"],
+  retirement: ["Should I invest in stocks?", "What if I invested more?", "How's my financial health?"],
+  budgeting: ["What subscriptions should I cancel?", "How much should I save each month?", "Am I overspending?"],
+  emergency_fund: [
+    "How long until I reach my emergency fund goal?",
+    "How much should I save each month?",
+    "Am I overspending?",
+  ],
+  taxes: ["What's hurting my finances most?", "Am I overspending?", "How's my financial health?"],
+  credit_score: ["Should I pay off debt or invest?", "What's hurting my finances most?", "How's my financial health?"],
+  home_buying: ["Can I afford a house?", "What if I bought a house?", "How's my financial health?"],
+  car_buying: ["Can I afford a new car?", "What if I bought a car?", "How's my financial health?"],
+  large_purchase: ["Can I afford a new car?", "How much should I save each month?", "How's my financial health?"],
+  salary_negotiation: ["What if I got a raise?", "How's my financial health?", "Am I overspending?"],
+  career_decisions: ["What if I got a raise?", "How's my financial health?", "Am I overspending?"],
+  college_savings: ["How much should I save each month?", "How's my financial health?", "Am I overspending?"],
+  insurance: ["Am I overspending?", "How's my financial health?", "What's hurting my finances most?"],
+  cash_flow: ["What's hurting my finances most?", "Am I overspending?", "How much should I save each month?"],
   general: ["Can I afford a new car?", "Am I overspending?", "What's hurting my finances most?"],
 };
 

@@ -300,6 +300,125 @@ export function answerCoachQuestion(
     };
   }
 
+  if (category === "debt_payoff") {
+    const worstDebt = [...profile.liabilities].sort((a, b) => b.interestRate - a.interestRate)[0];
+    const content = worstDebt
+      ? `Focus extra payments on your **${worstDebt.label}** first — it's your highest-rate debt at **${formatPercent(
+          worstDebt.interestRate / 100,
+          1
+        )}** APR, with a ${formatCurrency(worstDebt.balance)} balance and a ${formatCurrency(
+          worstDebt.minimumPayment
+        )}/mo minimum. Paying the highest-rate debt first (the "avalanche" method) minimizes total interest paid, even when it's not the fastest balance to zero out.`
+      : `You don't have any debt on file — nothing to pay off.`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
+  if (category === "investment_advice") {
+    const health = calculateHealthScore(profile);
+    const detail = health.details.investment;
+    const content = `You have **${formatCurrency(profile.totalInvestmentAssets)}** invested, against a rough benchmark of **${formatCurrency(
+      detail.targetValue
+    )}** (half a year's income). ${
+      detail.score >= 100 ? "You're ahead of that benchmark." : `You're at ${formatPercent(detail.score / 100)} of it.`
+    } General principle: diversify (index funds spread risk across the market instead of betting on single stocks), match your risk level to your time horizon (more stocks when a goal is decades away, more bonds/cash as it gets close), and remember returns aren't guaranteed — markets can drop as well as rise.`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
+  if (category === "retirement") {
+    const retirementBalance = profile.assets.filter((a) => a.type === "retirement").reduce((sum, a) => sum + a.balance, 0);
+    const content =
+      retirementBalance > 0
+        ? `You have **${formatCurrency(
+            retirementBalance
+          )}** in retirement accounts. Starting early matters most here — money invested for retirement has decades to compound, so consistent contributions now beat larger ones later.`
+        : `You don't have any accounts marked as type "Retirement" yet. If you have a 401(k) or IRA, add it in Settings so it counts toward your Financial Health Score's investment sub-score.`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
+  if (category === "credit_score") {
+    const debtToIncome = profile.monthlyIncome > 0 ? profile.totalMinimumPayments / profile.monthlyIncome : 0;
+    const content = `Summit doesn't have access to your actual credit score. What I can tell you: your minimum debt payments are **${formatPercent(
+      debtToIncome
+    )}** of your income — generally, paying on time and keeping credit utilization low are the two biggest levers for your score. Check a free source like your card issuer or annualcreditreport.com for your actual number.`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
+  if (category === "taxes") {
+    const content = `Summit doesn't handle tax planning or filing — that's outside what this rule-based engine can ground in your numbers. For anything tax-specific (deductions, filing status, withholding), a licensed tax professional or CPA is the right call.`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
+  if (category === "insurance") {
+    const insuranceSpend = profile.expensesByCategory.insurance ?? 0;
+    const content =
+      insuranceSpend > 0
+        ? `You're spending **${formatCurrency(
+            insuranceSpend
+          )}/mo** on insurance. I don't know what types or coverage levels that includes, so I can't say if it's enough or too much — but it's worth an annual review to make sure your coverage still matches your situation (home value, dependents, health needs, etc.).`
+        : `You haven't logged any insurance expenses. If you have any (health, auto, home, life), add them in Settings so they show up in your budget.`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
+  if (category === "career_decisions" || category === "salary_negotiation") {
+    const content = `I don't have enough context to weigh in on the specific decision, but here's what I can ground in your numbers: at your current **${formatCurrency(
+      profile.monthlyIncome
+    )}/mo** income, try asking a "what if" question — e.g. "what if I got a $5,000 raise?" — to see exactly how a change would move your projected net worth.`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
+  if (category === "college_savings") {
+    const content = `Summit doesn't have a dedicated college-savings goal type yet — the closest fit is adding a **Custom Goal** in Goals with your target amount and date, which will show up in projections just like any other goal.`;
+    return {
+      id: nextId(),
+      role: "assistant",
+      content: applyPersonalityTone(content, personality),
+      category,
+      followUps: getFollowUps(category),
+    };
+  }
+
   const [topRecommendation] = generateRecommendations(profile);
 
   if (isWhatsHurtingQuestion(q)) {

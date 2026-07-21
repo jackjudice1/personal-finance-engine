@@ -3,7 +3,7 @@ import { PricingTable } from "@/components/billing/PricingTable";
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description: "Simple, honest pricing for the Personal Finance Decision Engine.",
+  description: "Simple, honest pricing for Summit.",
 };
 
 const FAQ = [

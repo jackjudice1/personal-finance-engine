@@ -33,11 +33,11 @@ export default function OpengraphImage() {
             }}
           >
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0a1512" strokeWidth="2.5">
-              <path d="M3 17l6-6 4 4 8-8" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M15 7h6v6" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M2 19 L7 12 L10 15 L14 8 L19 3" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M13 3 L19 3 L19 9" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <div style={{ fontSize: 32, color: "#f4f7f5", fontWeight: 600 }}>Decision Engine</div>
+          <div style={{ fontSize: 32, color: "#f4f7f5", fontWeight: 600 }}>Summit</div>
         </div>
         <div style={{ display: "flex", fontSize: 64, fontWeight: 700, color: "#f4f7f5", lineHeight: 1.15, maxWidth: 900 }}>
           Your money. Your goals. Your next best decision.

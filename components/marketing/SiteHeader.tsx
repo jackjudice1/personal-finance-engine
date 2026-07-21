@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SummitLogo } from "@/components/shared/SummitLogo";
 
 const NAV_LINKS = [
   { href: "/#how-it-works", label: "How it works" },
@@ -14,9 +14,9 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <TrendingUp className="size-4.5" />
+            <SummitLogo className="size-4.5" />
           </span>
-          Decision Engine
+          Summit
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           {NAV_LINKS.map((link) => (

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TrendingUp } from "lucide-react";
+import { SummitLogo } from "@/components/shared/SummitLogo";
 
 const FOOTER_LINKS = {
   Product: [
@@ -21,9 +21,9 @@ export function SiteFooter() {
           <div className="max-w-xs space-y-3">
             <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
               <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <TrendingUp className="size-4" />
+                <SummitLogo className="size-4" />
               </span>
-              Decision Engine
+              Summit
             </Link>
             <p className="text-sm text-muted-foreground">
               Your money. Your goals. Your next best decision.
@@ -47,7 +47,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-10 border-t border-border/60 pt-6 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Personal Finance Decision Engine. Not a registered investment advisor —
+          © {new Date().getFullYear()} Summit. Not a registered investment advisor —
           recommendations are educational, not financial advice.
         </div>
       </div>

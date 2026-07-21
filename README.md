@@ -1,4 +1,4 @@
-# Personal Finance Decision Engine
+# Summit
 
 A financial operating system that answers *"What is the smartest financial decision I can make next?"* — not another budgeting app that shows you where your money went, but a decision engine that tells you what to do next.
 

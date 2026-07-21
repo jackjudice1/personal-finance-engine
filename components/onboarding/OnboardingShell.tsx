@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { TrendingUp } from "lucide-react";
+import { SummitLogo } from "@/components/shared/SummitLogo";
 import { OnboardingStepper } from "@/components/onboarding/OnboardingStepper";
 import { ONBOARDING_STEPS, type OnboardingStep } from "@/lib/validations/onboarding";
 
@@ -18,9 +18,9 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 py-10 sm:px-6">
       <div className="mb-10 flex items-center gap-2 self-center font-semibold tracking-tight">
         <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <TrendingUp className="size-4.5" />
+          <SummitLogo className="size-4.5" />
         </span>
-        Decision Engine
+        Summit
       </div>
       {!isCompleteScreen && (
         <div className="mb-10">

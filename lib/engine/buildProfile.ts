@@ -1,5 +1,5 @@
 import type { Database } from "@/types/database.types";
-import type { Asset, Expense, FinancialProfile, Goal, IncomeSource, Liability } from "@/types/financial";
+import type { Asset, Expense, FinancialProfile, Goal, IncomeSource, Liability, StockHolding } from "@/types/financial";
 import { toMonthlyAmount } from "@/types/financial";
 
 type IncomeRow = Database["public"]["Tables"]["income_sources"]["Row"];
@@ -7,6 +7,7 @@ type ExpenseRow = Database["public"]["Tables"]["expenses"]["Row"];
 type AssetRow = Database["public"]["Tables"]["assets"]["Row"];
 type LiabilityRow = Database["public"]["Tables"]["liabilities"]["Row"];
 type GoalRow = Database["public"]["Tables"]["goals"]["Row"];
+type StockHoldingRow = Database["public"]["Tables"]["stock_holdings"]["Row"];
 
 export interface RawFinancialData {
   userId: string;
@@ -15,6 +16,7 @@ export interface RawFinancialData {
   assets: AssetRow[];
   liabilities: LiabilityRow[];
   goals: GoalRow[];
+  stockHoldings: StockHoldingRow[];
 }
 
 /**
@@ -68,6 +70,16 @@ export function buildFinancialProfile(raw: RawFinancialData): FinancialProfile {
     status: row.status,
   }));
 
+  const stockHoldings: StockHolding[] = raw.stockHoldings.map((row) => ({
+    id: row.id,
+    ticker: row.ticker,
+    companyName: row.company_name,
+    shares: Number(row.shares),
+    costBasisPerShare: Number(row.cost_basis_per_share),
+    lastPrice: row.last_price === null ? null : Number(row.last_price),
+    lastPriceFetchedAt: row.last_price_fetched_at,
+  }));
+
   const monthlyIncome = incomeSources.reduce((sum, s) => sum + toMonthlyAmount(s.amount, s.frequency), 0);
   const monthlyExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
 
@@ -79,10 +91,20 @@ export function buildFinancialProfile(raw: RawFinancialData): FinancialProfile {
     {} as FinancialProfile["expensesByCategory"]
   );
 
-  const totalAssets = assets.reduce((sum, a) => sum + a.balance, 0);
-  const totalInvestmentAssets = assets
+  const totalStockHoldingsCostBasis = stockHoldings.reduce((sum, h) => sum + h.shares * h.costBasisPerShare, 0);
+  // Falls back to cost basis for a position that hasn't had its first price
+  // refresh yet (see hooks/useStockHoldings.ts) rather than counting it as $0.
+  const totalStockHoldingsValue = stockHoldings.reduce(
+    (sum, h) => sum + h.shares * (h.lastPrice ?? h.costBasisPerShare),
+    0
+  );
+
+  const genericAssetTotal = assets.reduce((sum, a) => sum + a.balance, 0);
+  const totalAssets = genericAssetTotal + totalStockHoldingsValue;
+  const genericInvestmentAssetTotal = assets
     .filter((a) => a.type === "investment" || a.type === "retirement")
     .reduce((sum, a) => sum + a.balance, 0);
+  const totalInvestmentAssets = genericInvestmentAssetTotal + totalStockHoldingsValue;
   const emergencyFundBalance = assets.filter((a) => a.isEmergencyFund).reduce((sum, a) => sum + a.balance, 0);
 
   const totalLiabilities = liabilities.reduce((sum, l) => sum + l.balance, 0);
@@ -105,6 +127,9 @@ export function buildFinancialProfile(raw: RawFinancialData): FinancialProfile {
     totalLiabilities,
     totalMinimumPayments,
     goals,
+    stockHoldings,
+    totalStockHoldingsCostBasis,
+    totalStockHoldingsValue,
     savingsRate,
   };
 }

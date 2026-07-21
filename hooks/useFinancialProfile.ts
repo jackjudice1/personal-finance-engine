@@ -37,18 +37,24 @@ export function useFinancialProfile(): UseFinancialProfileResult {
 
     async function load() {
       const supabase = createClient();
-      const [incomeRes, expensesRes, assetsRes, liabilitiesRes, goalsRes] = await Promise.all([
+      const [incomeRes, expensesRes, assetsRes, liabilitiesRes, goalsRes, stockHoldingsRes] = await Promise.all([
         supabase.from("income_sources").select("*").eq("user_id", user!.id),
         supabase.from("expenses").select("*").eq("user_id", user!.id),
         supabase.from("assets").select("*").eq("user_id", user!.id),
         supabase.from("liabilities").select("*").eq("user_id", user!.id),
         supabase.from("goals").select("*").eq("user_id", user!.id).eq("status", "active"),
+        supabase.from("stock_holdings").select("*").eq("user_id", user!.id),
       ]);
 
       if (cancelled) return;
 
       const firstError =
-        incomeRes.error ?? expensesRes.error ?? assetsRes.error ?? liabilitiesRes.error ?? goalsRes.error;
+        incomeRes.error ??
+        expensesRes.error ??
+        assetsRes.error ??
+        liabilitiesRes.error ??
+        goalsRes.error ??
+        stockHoldingsRes.error;
       if (firstError) {
         setError(firstError.message);
         setIsLoading(false);
@@ -63,6 +69,7 @@ export function useFinancialProfile(): UseFinancialProfileResult {
           assets: assetsRes.data ?? [],
           liabilities: liabilitiesRes.data ?? [],
           goals: goalsRes.data ?? [],
+          stockHoldings: stockHoldingsRes.data ?? [],
         })
       );
       setError(null);

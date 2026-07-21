@@ -21,12 +21,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Ask me an actual question." }, { status: 400 });
   }
 
-  const [incomeRes, expensesRes, assetsRes, liabilitiesRes, goalsRes] = await Promise.all([
+  const [incomeRes, expensesRes, assetsRes, liabilitiesRes, goalsRes, stockHoldingsRes] = await Promise.all([
     supabase.from("income_sources").select("*").eq("user_id", user.id),
     supabase.from("expenses").select("*").eq("user_id", user.id),
     supabase.from("assets").select("*").eq("user_id", user.id),
     supabase.from("liabilities").select("*").eq("user_id", user.id),
     supabase.from("goals").select("*").eq("user_id", user.id).eq("status", "active"),
+    supabase.from("stock_holdings").select("*").eq("user_id", user.id),
   ]);
 
   const profile = buildFinancialProfile({
@@ -36,6 +37,7 @@ export async function POST(request: Request) {
     assets: assetsRes.data ?? [],
     liabilities: liabilitiesRes.data ?? [],
     goals: goalsRes.data ?? [],
+    stockHoldings: stockHoldingsRes.data ?? [],
   });
 
   const answer = answerQuestion(parsed.data.question, profile);

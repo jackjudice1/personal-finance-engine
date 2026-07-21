@@ -52,6 +52,16 @@ export interface Goal {
   status: GoalStatus;
 }
 
+export interface StockHolding {
+  id: string;
+  ticker: string;
+  companyName: string | null;
+  shares: number;
+  costBasisPerShare: number;
+  lastPrice: number | null;
+  lastPriceFetchedAt: string | null;
+}
+
 /**
  * The aggregated shape every rule in lib/engine and lib/simulators consumes.
  * Built once per request from the raw Supabase rows (see
@@ -73,6 +83,9 @@ export interface FinancialProfile {
   totalLiabilities: number;
   totalMinimumPayments: number;
   goals: Goal[];
+  stockHoldings: StockHolding[];
+  totalStockHoldingsCostBasis: number;
+  totalStockHoldingsValue: number;
   savingsRate: number; // (income - expenses) / income, 0-1
 }
 

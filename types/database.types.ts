@@ -305,6 +305,28 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["health_score_snapshots"]["Row"]>;
         Relationships: [];
       };
+      stock_holdings: {
+        Row: {
+          id: string;
+          user_id: string;
+          ticker: string;
+          company_name: string | null;
+          shares: number;
+          cost_basis_per_share: number;
+          last_price: number | null;
+          last_price_fetched_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["stock_holdings"]["Row"]> & {
+          user_id: string;
+          ticker: string;
+          shares: number;
+          cost_basis_per_share: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["stock_holdings"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

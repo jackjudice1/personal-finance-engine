@@ -6,9 +6,11 @@ import {
   Bot,
   Calculator,
   LayoutDashboard,
+  Newspaper,
   Settings,
   Sparkles,
   Target,
+  TrendingUp,
   Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,6 +19,8 @@ import { SummitLogo } from "@/components/shared/SummitLogo";
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/goals", label: "Goals", icon: Target },
+  { href: "/dashboard/investing", label: "Investing", icon: TrendingUp },
+  { href: "/dashboard/news", label: "News", icon: Newspaper },
   { href: "/dashboard/recommendations", label: "Recommendations", icon: Sparkles },
   { href: "/dashboard/simulators", label: "Simulators", icon: Calculator },
   { href: "/dashboard/assistant", label: "Assistant", icon: Bot },

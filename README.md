@@ -7,6 +7,9 @@ A financial operating system that answers *"What is the smartest financial decis
 - **Financial Health Score** — a 0–100 composite score (cash flow, debt, savings, investment sub-scores)
 - **Decision Engine** — rule-based recommendation cards grounded in your real numbers
 - **Net worth tracker** — assets vs. liabilities, with a daily-snapshot trend chart
+- **Debts** — editable debt list with payment logging and a payoff projection chart
+- **Investing** — holdings tracking with live quotes and portfolio summary
+- **News** — personalized market news feed
 - **Goals** — house, debt freedom, retirement, etc., each with progress, timeline, and required monthly pace
 - **Simulators** — Can I Afford This?, Debt vs. Investing, and a What-If projection tool
 - **Gamification** — levels (Beginner → Financial Master) and achievements

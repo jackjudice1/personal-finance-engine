@@ -1,5 +1,5 @@
 import type { Liability } from "@/types/financial";
-import type { DebtFreedomSummary, DebtProjection, PayoffStrategy, TimeRemaining } from "@/types/debt";
+import type { BalanceOverTimePoint, DebtFreedomSummary, DebtProjection, PayoffStrategy, TimeRemaining } from "@/types/debt";
 
 /** Safety cap so a debt whose payment never covers interest can't loop forever. */
 const MAX_MONTHS = 600;
@@ -33,6 +33,7 @@ function emptySummary(): DebtFreedomSummary {
     overallProgressPercent: 100,
     totalEliminated: 0,
     perDebt: [],
+    balanceOverTime: [{ month: 0, totalBalance: 0 }],
   };
 }
 
@@ -63,6 +64,8 @@ export function projectDebtFreedom(
   // Debts that start already at zero balance are "paid off" from month 0, not "never pays off" (null) -
   // null is reserved for debts still active when the simulation hits MAX_MONTHS without reaching zero.
   const payoffMonth = new Map<string, number | null>(debts.map((d) => [d.id, d.balance <= 0 ? 0 : null]));
+  const startingTotalBalance = debts.reduce((sum, d) => sum + d.balance, 0);
+  const balanceOverTime: BalanceOverTimePoint[] = [{ month: 0, totalBalance: startingTotalBalance }];
 
   let month = 0;
   while ([...balances.values()].some((b) => b > 0) && month < MAX_MONTHS) {
@@ -101,6 +104,8 @@ export function projectDebtFreedom(
         pool = 0;
       }
     }
+
+    balanceOverTime.push({ month, totalBalance: [...balances.values()].reduce((sum, b) => sum + b, 0) });
   }
 
   const anyUnpaid = [...balances.values()].some((b) => b > 0);
@@ -130,6 +135,7 @@ export function projectDebtFreedom(
     overallProgressPercent: totalOriginal > 0 ? Math.min(100, Math.max(0, (totalEliminated / totalOriginal) * 100)) : 100,
     totalEliminated,
     perDebt,
+    balanceOverTime,
   };
 }
 

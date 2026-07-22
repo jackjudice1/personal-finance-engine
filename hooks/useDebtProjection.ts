@@ -23,7 +23,9 @@ export function useDebtProjection(
   debts: Liability[],
   strategy: PayoffStrategy = "avalanche",
   extraMonthlyPayment = 0,
-  customOrder?: string[]
+  customOrder?: string[],
+  /** The real, untransformed debts - used only to price interestPaidToDate at the actual rate. Defaults to `debts` when there's no what-if transform in play; pass the real array separately when `debts` might be a hypothetical (e.g. a refinance what-if), since a future rate change can't retroactively change interest already paid. */
+  realDebts: Liability[] = debts
 ): DebtFreedomSummary | null {
   const { user } = useSupabaseUser();
   const [paymentsByDebt, setPaymentsByDebt] = useState<Record<string, DebtPaymentPoint[]>>({});
@@ -64,18 +66,18 @@ export function useDebtProjection(
     if (debts.length === 0) return null;
 
     const summary = projectDebtFreedom(debts, strategy, extraMonthlyPayment, customOrder);
-    const debtsById = new Map(debts.map((d) => [d.id, d]));
+    const realDebtsById = new Map(realDebts.map((d) => [d.id, d]));
 
     return {
       ...summary,
       perDebt: summary.perDebt.map((projection) => {
-        const debt = debtsById.get(projection.debtId);
+        const realDebt = realDebtsById.get(projection.debtId);
         const payments = paymentsByDebt[projection.debtId] ?? [];
         return {
           ...projection,
-          interestPaidToDate: debt ? estimateInterestPaidToDate(payments, debt.interestRate) : 0,
+          interestPaidToDate: realDebt ? estimateInterestPaidToDate(payments, realDebt.interestRate) : 0,
         };
       }),
     };
-  }, [debts, strategy, extraMonthlyPayment, customOrder, paymentsByDebt]);
+  }, [debts, strategy, extraMonthlyPayment, customOrder, realDebts, paymentsByDebt]);
 }

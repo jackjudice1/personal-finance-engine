@@ -10,6 +10,11 @@ export interface DebtProjection {
   interestPaidToDate: number;
 }
 
+export interface BalanceOverTimePoint {
+  month: number;
+  totalBalance: number;
+}
+
 export interface DebtFreedomSummary {
   debtFreeDate: string | null;
   totalMonthsRemaining: number | null;
@@ -19,6 +24,7 @@ export interface DebtFreedomSummary {
   overallProgressPercent: number;
   totalEliminated: number;
   perDebt: DebtProjection[];
+  balanceOverTime: BalanceOverTimePoint[];
 }
 
 export interface TimeRemaining {

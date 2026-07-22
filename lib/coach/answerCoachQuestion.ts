@@ -355,7 +355,7 @@ export function answerCoachQuestion(
 
   if (category === "credit_score") {
     const debtToIncome = profile.monthlyIncome > 0 ? profile.totalMinimumPayments / profile.monthlyIncome : 0;
-    const content = `Summit doesn't have access to your actual credit score. What I can tell you: your minimum debt payments are **${formatPercent(
+    const content = `Summora Systems doesn't have access to your actual credit score. What I can tell you: your minimum debt payments are **${formatPercent(
       debtToIncome
     )}** of your income — generally, paying on time and keeping credit utilization low are the two biggest levers for your score. Check a free source like your card issuer or annualcreditreport.com for your actual number.`;
     return {
@@ -368,7 +368,7 @@ export function answerCoachQuestion(
   }
 
   if (category === "taxes") {
-    const content = `Summit doesn't handle tax planning or filing — that's outside what this rule-based engine can ground in your numbers. For anything tax-specific (deductions, filing status, withholding), a licensed tax professional or CPA is the right call.`;
+    const content = `Summora Systems doesn't handle tax planning or filing — that's outside what this rule-based engine can ground in your numbers. For anything tax-specific (deductions, filing status, withholding), a licensed tax professional or CPA is the right call.`;
     return {
       id: nextId(),
       role: "assistant",
@@ -409,7 +409,7 @@ export function answerCoachQuestion(
   }
 
   if (category === "college_savings") {
-    const content = `Summit doesn't have a dedicated college-savings goal type yet — the closest fit is adding a **Custom Goal** in Goals with your target amount and date, which will show up in projections just like any other goal.`;
+    const content = `Summora Systems doesn't have a dedicated college-savings goal type yet — the closest fit is adding a **Custom Goal** in Goals with your target amount and date, which will show up in projections just like any other goal.`;
     return {
       id: nextId(),
       role: "assistant",

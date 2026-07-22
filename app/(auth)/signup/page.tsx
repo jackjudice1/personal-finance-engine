@@ -21,7 +21,7 @@ export default function SignupPage() {
           </Link>
         </p>
         <p className="text-center text-xs text-muted-foreground">
-          By signing up, you agree to Summit&apos;s{" "}
+          By signing up, you agree to Summora&apos;s{" "}
           <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">
             Terms
           </Link>{" "}

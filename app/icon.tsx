@@ -13,13 +13,17 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#38caa0",
+          background: "#10203f",
           borderRadius: 7,
         }}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a1512" strokeWidth="2.5">
-          <path d="M2 19 L7 12 L10 15 L14 8 L19 3" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M13 3 L19 3 L19 9" strokeLinecap="round" strokeLinejoin="round" />
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5">
+          <path
+            d="M17 5.5C11 5.5 8 7.5 8 10.5C8 13 11 13.5 12 13.5C13 13.5 16 14 16 16.5C16 19.5 13 20.5 7 20.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path d="M13 18 L19 12 M19 16 V12 H15" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
     ),

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { PartyPopper } from "lucide-react";
 import type { Liability } from "@/types/financial";
 
-const STORAGE_KEY = "summit:debt-balances";
+const STORAGE_KEY = "summora:debt-balances";
 
 function readSnapshot(): Record<string, number> {
   try {

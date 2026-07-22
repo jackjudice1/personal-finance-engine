@@ -15,7 +15,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SummitLogo } from "@/components/shared/SummitLogo";
+import { SummoraLogo } from "@/components/shared/SummoraLogo";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -37,9 +37,9 @@ export function DashboardSidebar() {
     <aside className="hidden w-60 shrink-0 border-r border-border/60 bg-card/40 lg:flex lg:flex-col">
       <div className="flex h-16 items-center gap-2 px-5 font-semibold tracking-tight">
         <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <SummitLogo className="size-4.5" />
+          <SummoraLogo className="size-4.5" />
         </span>
-        Summit
+        Summora
       </div>
       <nav className="flex-1 space-y-1 px-3 py-2">
         {NAV_ITEMS.map((item) => {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SummitLogo } from "@/components/shared/SummitLogo";
+import { SummoraLogo } from "@/components/shared/SummoraLogo";
 
 const FOOTER_LINKS = {
   Product: [
@@ -25,9 +25,9 @@ export function SiteFooter() {
           <div className="max-w-xs space-y-3">
             <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
               <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <SummitLogo className="size-4" />
+                <SummoraLogo className="size-4" />
               </span>
-              Summit
+              Summora
             </Link>
             <p className="text-sm text-muted-foreground">
               Your money. Your goals. Your next best decision.
@@ -51,7 +51,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-10 border-t border-border/60 pt-6 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Summit. Not a registered investment advisor — recommendations are
+          © {new Date().getFullYear()} Summora Systems. Not a registered investment advisor — recommendations are
           educational, not financial advice. See our{" "}
           <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">
             Terms

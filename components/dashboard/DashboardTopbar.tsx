@@ -38,7 +38,7 @@ export function DashboardTopbar() {
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border/60 px-4 sm:px-6">
-      <div className="flex items-center gap-2 font-semibold tracking-tight lg:hidden">Summit</div>
+      <div className="flex items-center gap-2 font-semibold tracking-tight lg:hidden">Summora</div>
       <div className="ml-auto flex items-center gap-2">
         <Button variant="outline" size="sm" nativeButton={false} render={<Link href="/dashboard/settings/billing" />}>
           <Sparkles className="size-3.5 text-premium" />

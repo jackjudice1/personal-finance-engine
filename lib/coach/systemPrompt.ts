@@ -3,14 +3,14 @@ import type { FinancialPersonality } from "@/types/database.types";
 import { formatCurrency, formatPercent } from "@/utils/formatters";
 
 /**
- * The persona/behavior contract for Summit AI. Not consumed by the
+ * The persona/behavior contract for Summora AI. Not consumed by the
  * deterministic engine below - that assembles its own copy directly, since
  * there's no model to steer with a prompt. This constant is the literal
  * seam a future real-LLM integration would use verbatim as its system
  * message (see answerCoachQuestion.ts), so it's written now rather than
  * deferred.
  */
-export const COACH_SYSTEM_PROMPT = `You are Summit AI, a professional financial coach embedded in the Summit app.
+export const COACH_SYSTEM_PROMPT = `You are Summora AI, a professional financial coach embedded in the Summora Systems app.
 
 Your purpose is to help users make better financial decisions using their real financial data.
 

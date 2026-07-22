@@ -14,8 +14,8 @@ export default function PrivacyPolicyPage() {
 
       <div className="space-y-6 text-sm leading-relaxed text-muted-foreground">
         <p>
-          Summit (&quot;we,&quot; &quot;us&quot;) is an independently operated project, not a bank, broker-dealer, or registered
-          investment adviser. This policy explains what information Summit collects, how it&apos;s used, and how
+          Summora Systems (&quot;we,&quot; &quot;us&quot;) is an independently operated project, not a bank, broker-dealer, or registered
+          investment adviser. This policy explains what information Summora Systems collects, how it&apos;s used, and how
           it&apos;s protected.
         </p>
 
@@ -34,7 +34,7 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-2">
           <h2 className="text-base font-medium text-foreground">How we use it</h2>
           <p>
-            Solely to power Summit&apos;s features for you: your Financial Health Score, recommendations, net worth
+            Solely to power Summora Systems&apos; features for you: your Financial Health Score, recommendations, net worth
             tracking, simulators, and the AI Financial Coach. We do not sell your data, use it for advertising, or
             share it with third parties for marketing purposes.
           </p>
@@ -66,7 +66,7 @@ export default function PrivacyPolicyPage() {
             Every table in our database uses row-level security, enforced by the database itself: the code only
             ever runs queries scoped to your own account, so other users cannot read your data through the app. Data
             is encrypted in transit (HTTPS) and at rest by our hosting provider. As with any hosted application, the
-            operator of Summit retains administrative access to the underlying database — this policy commits to
+            operator of Summora Systems retains administrative access to the underlying database — this policy commits to
             never using that access to view your data except to fix a bug you&apos;ve reported or as required by
             law.
           </p>
@@ -86,14 +86,14 @@ export default function PrivacyPolicyPage() {
 
         <section className="space-y-2">
           <h2 className="text-base font-medium text-foreground">Children&apos;s privacy</h2>
-          <p>Summit is not directed at children under 13, and we do not knowingly collect their information.</p>
+          <p>Summora Systems is not directed at children under 13, and we do not knowingly collect their information.</p>
         </section>
 
         <section className="space-y-2">
           <h2 className="text-base font-medium text-foreground">Changes to this policy</h2>
           <p>
             If this policy changes materially, we&apos;ll update the date at the top of this page. Continued use of
-            Summit after a change means you accept the updated policy.
+            Summora Systems after a change means you accept the updated policy.
           </p>
         </section>
 

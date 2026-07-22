@@ -23,11 +23,8 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="flex flex-col gap-10 md:flex-row md:justify-between">
           <div className="max-w-xs space-y-3">
-            <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-              <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <SummoraLogo className="size-4" />
-              </span>
-              Summora
+            <Link href="/" className="flex items-center">
+              <SummoraLogo className="h-6 w-auto" />
             </Link>
             <p className="text-sm text-muted-foreground">
               Your money. Your goals. Your next best decision.

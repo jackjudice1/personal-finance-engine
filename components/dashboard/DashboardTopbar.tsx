@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useSupabaseUser } from "@/hooks/useSupabaseUser";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
+import { SummoraLogo } from "@/components/shared/SummoraLogo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,7 +39,9 @@ export function DashboardTopbar() {
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border/60 px-4 sm:px-6">
-      <div className="flex items-center gap-2 font-semibold tracking-tight lg:hidden">Summora</div>
+      <div className="flex items-center lg:hidden">
+        <SummoraLogo className="h-6 w-auto" />
+      </div>
       <div className="ml-auto flex items-center gap-2">
         <Button variant="outline" size="sm" nativeButton={false} render={<Link href="/dashboard/settings/billing" />}>
           <Sparkles className="size-3.5 text-premium" />

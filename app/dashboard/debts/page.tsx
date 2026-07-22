@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { CreditCard, Plus } from "lucide-react";
 import { useDebts } from "@/hooks/useDebts";
+import { useDebtProjection } from "@/hooks/useDebtProjection";
 import { DebtCard } from "@/components/debts/DebtCard";
+import { DebtFreedomCountdown } from "@/components/debts/DebtFreedomCountdown";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DebtsPage() {
   const { debts, isLoading } = useDebts();
+  const summary = useDebtProjection(debts, "avalanche", 0);
+  const projectionByDebtId = new Map(summary?.perDebt.map((p) => [p.debtId, p]) ?? []);
   const activeDebts = debts.filter((d) => d.balance > 0);
   const paidOffDebts = debts.filter((d) => d.balance === 0);
 
@@ -45,11 +49,14 @@ export default function DebtsPage() {
         </div>
       ) : (
         <>
+          {summary && <DebtFreedomCountdown summary={summary} />}
+
           {activeDebts.length > 0 && (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {activeDebts.map((debt) => (
-                <DebtCard key={debt.id} debt={debt} />
-              ))}
+              {activeDebts.map((debt) => {
+                const projection = projectionByDebtId.get(debt.id);
+                return projection ? <DebtCard key={debt.id} debt={debt} projection={projection} /> : null;
+              })}
             </div>
           )}
 
@@ -57,9 +64,10 @@ export default function DebtsPage() {
             <div className="space-y-3">
               <h2 className="text-sm font-medium text-muted-foreground">Paid off</h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {paidOffDebts.map((debt) => (
-                  <DebtCard key={debt.id} debt={debt} />
-                ))}
+                {paidOffDebts.map((debt) => {
+                  const projection = projectionByDebtId.get(debt.id);
+                  return projection ? <DebtCard key={debt.id} debt={debt} projection={projection} /> : null;
+                })}
               </div>
             </div>
           )}

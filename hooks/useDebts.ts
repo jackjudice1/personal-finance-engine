@@ -11,6 +11,7 @@ function mapRow(row: {
   type: Liability["type"];
   label: string;
   balance: number;
+  original_balance: number;
   interest_rate: number;
   minimum_payment: number | null;
 }): Liability {
@@ -19,6 +20,7 @@ function mapRow(row: {
     type: row.type,
     label: row.label,
     balance: Number(row.balance),
+    originalBalance: Number(row.original_balance),
     interestRate: Number(row.interest_rate),
     minimumPayment: Number(row.minimum_payment ?? 0),
   };
@@ -65,6 +67,7 @@ export function useDebts() {
       type: input.type,
       label: input.label,
       balance: input.balance,
+      original_balance: input.balance,
       interest_rate: input.interestRate,
       minimum_payment: input.minimumPayment,
     });

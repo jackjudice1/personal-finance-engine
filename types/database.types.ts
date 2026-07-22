@@ -124,6 +124,7 @@ export interface Database {
           type: LiabilityType;
           label: string;
           balance: number;
+          original_balance: number;
           interest_rate: number;
           minimum_payment: number | null;
           created_at: string;

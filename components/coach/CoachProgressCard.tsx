@@ -1,12 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-
-function barColor(pct: number) {
-  if (pct >= 70) return "bg-primary";
-  if (pct >= 40) return "bg-warning";
-  return "bg-destructive";
-}
+import { cn, getUrgencyColor } from "@/lib/utils";
 
 export function CoachProgressCard({
   icon: Icon,
@@ -35,7 +29,7 @@ export function CoachProgressCard({
           </div>
         </div>
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-          <div className={cn("h-full rounded-full transition-all", barColor(clamped))} style={{ width: `${clamped}%` }} />
+          <div className={cn("h-full rounded-full transition-all", getUrgencyColor(clamped))} style={{ width: `${clamped}%` }} />
         </div>
         <p className="text-xs text-muted-foreground">{detail}</p>
       </CardContent>

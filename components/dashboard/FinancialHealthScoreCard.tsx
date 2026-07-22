@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import type { HealthScoreBreakdown, HealthScoreSubKey } from "@/types/engine";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoTooltip } from "@/components/shared/InfoTooltip";
-import { cn } from "@/lib/utils";
+import { cn, getUrgencyColor } from "@/lib/utils";
 
 const OVERALL_SCORE_EXPLANATION =
   "The average of the four scores below (each worth 25%). It only moves as fast as your slowest-improving area — a great cash flow score can't make up for an empty emergency fund or no investments.";
@@ -35,12 +35,6 @@ const SUB_SCORES: { key: HealthScoreSubKey; label: string; explanation: string }
   },
 ];
 
-function scoreColor(score: number) {
-  if (score >= 70) return "bg-primary";
-  if (score >= 40) return "bg-warning";
-  return "bg-destructive";
-}
-
 export function FinancialHealthScoreCard({ health }: { health: HealthScoreBreakdown }) {
   const circumference = 2 * Math.PI * 42;
   const offset = circumference * (1 - health.overall / 100);
@@ -64,7 +58,7 @@ export function FinancialHealthScoreCard({ health }: { health: HealthScoreBreakd
                 r="42"
                 strokeWidth="8"
                 strokeLinecap="round"
-                className={cn("fill-none transition-all", scoreColor(health.overall).replace("bg-", "stroke-"))}
+                className={cn("fill-none transition-all", getUrgencyColor(health.overall).replace("bg-", "stroke-"))}
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}
               />
@@ -94,7 +88,7 @@ export function FinancialHealthScoreCard({ health }: { health: HealthScoreBreakd
                 </div>
                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className={cn("h-full rounded-full transition-all", scoreColor(detail.score))}
+                    className={cn("h-full rounded-full transition-all", getUrgencyColor(detail.score))}
                     style={{ width: `${detail.score}%` }}
                   />
                 </div>

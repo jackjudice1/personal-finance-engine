@@ -54,6 +54,7 @@ export function buildFinancialProfile(raw: RawFinancialData): FinancialProfile {
     type: row.type,
     label: row.label,
     balance: Number(row.balance),
+    originalBalance: Number(row.original_balance),
     interestRate: Number(row.interest_rate),
     minimumPayment: Number(row.minimum_payment ?? 0),
   }));

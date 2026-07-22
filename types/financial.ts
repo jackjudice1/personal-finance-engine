@@ -36,6 +36,7 @@ export interface Liability {
   type: LiabilityType;
   label: string;
   balance: number;
+  originalBalance: number;
   interestRate: number;
   minimumPayment: number;
 }

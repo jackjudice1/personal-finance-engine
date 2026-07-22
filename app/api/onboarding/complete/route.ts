@@ -56,6 +56,7 @@ export async function POST(request: Request) {
     type: l.type,
     label: l.label,
     balance: l.balance,
+    original_balance: l.balance,
     interest_rate: l.interestRate,
     minimum_payment: l.minimumPayment,
   }));

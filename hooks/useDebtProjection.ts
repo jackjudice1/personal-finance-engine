@@ -1,23 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { useSupabaseUser } from "@/hooks/useSupabaseUser";
+import { useMemo } from "react";
 import type { Liability } from "@/types/financial";
 import type { DebtFreedomSummary, PayoffStrategy } from "@/types/debt";
-import type { DebtPaymentPoint } from "@/hooks/useDebtPaymentHistory";
+import { useAllDebtPayments } from "@/hooks/useAllDebtPayments";
 import { projectDebtFreedom } from "@/lib/simulators/debtPayoff";
 import { estimateInterestPaidToDate } from "@/lib/simulators/interestCalculations";
 
 /**
  * The single source of truth for payoff projections: runs projectDebtFreedom
- * in a memo keyed on every input that affects it, and separately fetches
- * every debt's payment history once (bulk, not per-liability like
- * useDebtPaymentHistory) to fill in each debt's interestPaidToDate. Any
- * component showing payoff numbers should read from this hook rather than
- * calling projectDebtFreedom directly, so the hero card, debt list, and
- * (in later phases) the strategy comparison and simulator never drift out
- * of sync with each other.
+ * in a memo keyed on every input that affects it, and pulls in every debt's
+ * payment history (via useAllDebtPayments) to fill in each debt's
+ * interestPaidToDate. Any component showing payoff numbers should read from
+ * this hook rather than calling projectDebtFreedom directly, so the hero
+ * card, debt list, strategy comparison, and simulator never drift out of
+ * sync with each other.
  */
 export function useDebtProjection(
   debts: Liability[],
@@ -27,40 +24,7 @@ export function useDebtProjection(
   /** The real, untransformed debts - used only to price interestPaidToDate at the actual rate. Defaults to `debts` when there's no what-if transform in play; pass the real array separately when `debts` might be a hypothetical (e.g. a refinance what-if), since a future rate change can't retroactively change interest already paid. */
   realDebts: Liability[] = debts
 ): DebtFreedomSummary | null {
-  const { user } = useSupabaseUser();
-  const [paymentsByDebt, setPaymentsByDebt] = useState<Record<string, DebtPaymentPoint[]>>({});
-
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-
-    async function load() {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("debt_payments")
-        .select("*")
-        .eq("user_id", user!.id)
-        .order("paid_at", { ascending: true });
-      if (cancelled) return;
-
-      const grouped: Record<string, DebtPaymentPoint[]> = {};
-      for (const row of data ?? []) {
-        const point: DebtPaymentPoint = {
-          id: row.id,
-          paidAt: row.paid_at,
-          amount: Number(row.amount),
-          balanceAfter: Number(row.balance_after),
-        };
-        (grouped[row.liability_id] ??= []).push(point);
-      }
-      setPaymentsByDebt(grouped);
-    }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
+  const paymentsByDebt = useAllDebtPayments();
 
   return useMemo(() => {
     if (debts.length === 0) return null;

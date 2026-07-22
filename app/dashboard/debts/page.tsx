@@ -5,6 +5,10 @@ import Link from "next/link";
 import { CreditCard, Plus } from "lucide-react";
 import { useDebts } from "@/hooks/useDebts";
 import { useDebtProjection } from "@/hooks/useDebtProjection";
+import { useAllDebtPayments } from "@/hooks/useAllDebtPayments";
+import { useFinancialProfile } from "@/hooks/useFinancialProfile";
+import { useHealthScore } from "@/hooks/useHealthScore";
+import { useAchievements } from "@/hooks/useAchievements";
 import { applyWhatIfPreset, type WhatIfPreset } from "@/lib/simulators/debtWhatIf";
 import type { PayoffStrategy } from "@/types/debt";
 import { DebtCard } from "@/components/debts/DebtCard";
@@ -13,11 +17,20 @@ import { ExtraPaymentSimulator } from "@/components/debts/ExtraPaymentSimulator"
 import { DebtWhatIfPresets } from "@/components/debts/DebtWhatIfPresets";
 import { DebtStrategyComparison } from "@/components/debts/DebtStrategyComparison";
 import { DebtTimeline } from "@/components/debts/DebtTimeline";
+import { DebtInsights } from "@/components/debts/DebtInsights";
+import { DebtHistoryCharts } from "@/components/debts/DebtHistoryCharts";
+import { DebtCelebration } from "@/components/debts/DebtCelebration";
+import { LevelUpToast } from "@/components/gamification/LevelUpToast";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DebtsPage() {
   const { debts, isLoading } = useDebts();
+  const paymentsByDebt = useAllDebtPayments();
+  const { profile } = useFinancialProfile();
+  const health = useHealthScore(profile);
+  const { newlyUnlocked } = useAchievements(profile, health);
+
   const [strategy, setStrategy] = useState<PayoffStrategy>("avalanche");
   const [extraMonthlyPayment, setExtraMonthlyPayment] = useState(0);
   const [activeWhatIf, setActiveWhatIf] = useState<WhatIfPreset | null>(null);
@@ -34,9 +47,13 @@ export default function DebtsPage() {
   const projectionByDebtId = new Map(summary?.perDebt.map((p) => [p.debtId, p]) ?? []);
   const activeDebts = debts.filter((d) => d.balance > 0);
   const paidOffDebts = debts.filter((d) => d.balance === 0);
+  const debtDestroyerUnlock = newlyUnlocked.filter((a) => a.key === "debt_destroyer");
 
   return (
     <div className="space-y-5">
+      <DebtCelebration debts={debts} />
+      <LevelUpToast leveledUp={false} level={null} newlyUnlocked={debtDestroyerUnlock} />
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold">Debts</h1>
@@ -70,6 +87,16 @@ export default function DebtsPage() {
         <>
           {summary && <DebtFreedomCountdown summary={summary} />}
 
+          {summary && (
+            <DebtInsights
+              debts={debts}
+              summary={summary}
+              strategy={strategy}
+              extraMonthlyPayment={effectiveExtraPayment}
+              customOrder={effectiveCustomOrder}
+            />
+          )}
+
           {activeDebts.length > 1 && summary && (
             <div className="grid gap-4 lg:grid-cols-2">
               <ExtraPaymentSimulator value={extraMonthlyPayment} onChange={setExtraMonthlyPayment} />
@@ -92,6 +119,8 @@ export default function DebtsPage() {
           )}
 
           {summary && <DebtTimeline summary={summary} debts={debts} />}
+
+          <DebtHistoryCharts debts={debts} paymentsByDebt={paymentsByDebt} />
 
           {activeDebts.length > 0 && (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

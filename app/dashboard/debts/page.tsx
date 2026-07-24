@@ -10,9 +10,11 @@ import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { useHealthScore } from "@/hooks/useHealthScore";
 import { useAchievements } from "@/hooks/useAchievements";
 import { applyWhatIfPreset, type WhatIfPreset } from "@/lib/simulators/debtWhatIf";
+import { getPaymentPlan } from "@/lib/simulators/debtPayoff";
 import type { PayoffStrategy } from "@/types/debt";
 import { DebtCard } from "@/components/debts/DebtCard";
 import { DebtFreedomCountdown } from "@/components/debts/DebtFreedomCountdown";
+import { DebtPaymentPlan } from "@/components/debts/DebtPaymentPlan";
 import { ExtraPaymentSimulator } from "@/components/debts/ExtraPaymentSimulator";
 import { DebtWhatIfPresets } from "@/components/debts/DebtWhatIfPresets";
 import { DebtStrategyComparison } from "@/components/debts/DebtStrategyComparison";
@@ -57,6 +59,7 @@ export default function DebtsPage() {
 
   const activeDebts = debts.filter((d) => d.balance > 0).sort(byPayoffOrder);
   const paidOffDebts = debts.filter((d) => d.balance === 0);
+  const paymentPlan = getPaymentPlan(effectiveDebts, strategy, effectiveExtraPayment, effectiveCustomOrder);
   const debtDestroyerUnlock = newlyUnlocked.filter((a) => a.key === "debt_destroyer");
 
   return (
@@ -96,6 +99,8 @@ export default function DebtsPage() {
       ) : (
         <>
           {summary && <DebtFreedomCountdown summary={summary} />}
+
+          <DebtPaymentPlan debts={debts} plan={paymentPlan} />
 
           {summary && (
             <DebtInsights

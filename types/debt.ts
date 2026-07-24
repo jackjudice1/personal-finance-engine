@@ -32,3 +32,11 @@ export interface TimeRemaining {
   months: number;
   days: number;
 }
+
+/** What's actually being paid toward one debt this month under the active strategy - the minimum, plus any of the extra-payment pool routed to it as the current priority target. */
+export interface DebtPaymentPlanItem {
+  debtId: string;
+  minimumPayment: number;
+  extraPayment: number;
+  totalPayment: number;
+}

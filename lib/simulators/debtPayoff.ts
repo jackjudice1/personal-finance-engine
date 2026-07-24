@@ -1,5 +1,12 @@
 import type { Liability } from "@/types/financial";
-import type { BalanceOverTimePoint, DebtFreedomSummary, DebtProjection, PayoffStrategy, TimeRemaining } from "@/types/debt";
+import type {
+  BalanceOverTimePoint,
+  DebtFreedomSummary,
+  DebtPaymentPlanItem,
+  DebtProjection,
+  PayoffStrategy,
+  TimeRemaining,
+} from "@/types/debt";
 
 /** Safety cap so a debt whose payment never covers interest can't loop forever. */
 const MAX_MONTHS = 600;
@@ -140,6 +147,49 @@ export function projectDebtFreedom(
     perDebt,
     balanceOverTime,
   };
+}
+
+/**
+ * What you're actually paying toward each active debt this month: its minimum
+ * (capped at its remaining balance), plus any of the extra-payment pool
+ * (the slider amount, plus already-paid-off debts' freed-up minimums) routed
+ * to it as the current priority target under the active strategy. Mirrors
+ * the pool-distribution logic in projectDebtFreedom's month loop, but for
+ * the current balances only - a plan for right now, not a projection.
+ */
+export function getPaymentPlan(
+  debts: Liability[],
+  strategy: PayoffStrategy,
+  extraMonthlyPayment: number,
+  customOrder?: string[]
+): DebtPaymentPlanItem[] {
+  const activeDebts = debts.filter((d) => d.balance > 0);
+  if (activeDebts.length === 0) return [];
+
+  const order = orderedDebtIds(activeDebts, strategy, customOrder);
+  const paidOffMinimums = debts.reduce((sum, d) => (d.balance <= 0 ? sum + d.minimumPayment : sum), 0);
+  let pool = extraMonthlyPayment + paidOffMinimums;
+
+  const minimums = new Map(activeDebts.map((d) => [d.id, Math.min(d.minimumPayment, d.balance)]));
+  const remaining = new Map(activeDebts.map((d) => [d.id, d.balance - minimums.get(d.id)!]));
+  const extras = new Map(activeDebts.map((d) => [d.id, 0]));
+
+  for (const id of order) {
+    if (pool <= 0) break;
+    const bal = remaining.get(id);
+    if (bal === undefined || bal <= 0) continue;
+    const applied = Math.min(pool, bal);
+    extras.set(id, applied);
+    remaining.set(id, bal - applied);
+    pool -= applied;
+  }
+
+  return activeDebts.map((d) => ({
+    debtId: d.id,
+    minimumPayment: minimums.get(d.id)!,
+    extraPayment: extras.get(d.id) ?? 0,
+    totalPayment: minimums.get(d.id)! + (extras.get(d.id) ?? 0),
+  }));
 }
 
 /** Calendar breakdown of the time between now and a target date - years/months/days, not a raw day count. */

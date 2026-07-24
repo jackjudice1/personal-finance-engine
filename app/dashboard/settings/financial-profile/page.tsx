@@ -6,8 +6,16 @@ import { ArrowRight, Trash2 } from "lucide-react";
 import { useIncomeSources } from "@/hooks/useIncomeSources";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useAssets } from "@/hooks/useAssets";
-import { EXPENSE_CATEGORY_LABELS, ASSET_TYPE_LABELS, toNetAmount } from "@/types/financial";
+import {
+  EXPENSE_CATEGORY_LABELS,
+  ASSET_TYPE_LABELS,
+  INCOME_TYPE_LABELS,
+  INCOME_FREQUENCY_LABELS,
+  INCOME_FREQUENCY_NOUN,
+  toNetAmount,
+} from "@/types/financial";
 import type { IncomeSource } from "@/types/financial";
+import type { IncomeFrequency, IncomeType } from "@/types/database.types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,25 +40,70 @@ function Row({ label, sub, onDelete }: { label: string; sub: string; onDelete: (
 
 function IncomeRow({
   item,
-  onUpdateDeductionRate,
+  onUpdate,
   onDelete,
 }: {
   item: IncomeSource;
-  onUpdateDeductionRate: (rate: number | null) => void;
+  onUpdate: (updates: Partial<{ label: string; amount: number; frequency: IncomeFrequency; type: IncomeType; deductionRate: number | null }>) => void;
   onDelete: () => void;
 }) {
+  const [label, setLabel] = useState(item.label);
+  const [amount, setAmount] = useState(item.amount);
   const [rate, setRate] = useState<number | null>(item.deductionRate);
 
   return (
     <div className="space-y-2 rounded-lg border border-border/60 p-3 text-sm">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-medium">{item.label}</p>
-          <p className="text-xs text-muted-foreground">
-            {formatCurrency(item.amount)} / {item.frequency}
-          </p>
+      <div className="flex items-start justify-between gap-2">
+        <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Source</Label>
+            <Input
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              onBlur={() => label !== item.label && onUpdate({ label })}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Type</Label>
+            <Select value={item.type} onValueChange={(v) => onUpdate({ type: v as IncomeType })}>
+              <SelectTrigger className="w-full">
+                <SelectValue>{(value: string) => INCOME_TYPE_LABELS[value as keyof typeof INCOME_TYPE_LABELS]}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(INCOME_TYPE_LABELS).map(([value, l]) => (
+                  <SelectItem key={value} value={value}>
+                    {l}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Amount</Label>
+            <Input
+              type="number"
+              value={amount || ""}
+              onChange={(e) => setAmount(Number(e.target.value))}
+              onBlur={() => amount !== item.amount && onUpdate({ amount })}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Frequency</Label>
+            <Select value={item.frequency} onValueChange={(v) => onUpdate({ frequency: v as IncomeFrequency })}>
+              <SelectTrigger className="w-full">
+                <SelectValue>{(value: string) => INCOME_FREQUENCY_LABELS[value as keyof typeof INCOME_FREQUENCY_LABELS]}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(INCOME_FREQUENCY_LABELS).map(([value, l]) => (
+                  <SelectItem key={value} value={value}>
+                    {l}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <Button variant="ghost" size="icon-sm" onClick={onDelete} aria-label="Remove">
+        <Button variant="ghost" size="icon-sm" onClick={onDelete} aria-label="Remove" className="mt-5">
           <Trash2 className="size-3.5" />
         </Button>
       </div>
@@ -68,12 +121,12 @@ function IncomeRow({
           className="w-24"
           value={rate ?? ""}
           onChange={(e) => setRate(e.target.value === "" ? null : Number(e.target.value))}
-          onBlur={() => onUpdateDeductionRate(rate)}
+          onBlur={() => rate !== item.deductionRate && onUpdate({ deductionRate: rate })}
         />
         {rate ? (
           <p className="text-xs text-muted-foreground">
             ≈ <span className="font-medium text-foreground">{formatCurrency(toNetAmount(item.amount, rate))}</span> net /{" "}
-            {item.frequency}
+            {INCOME_FREQUENCY_NOUN[item.frequency]}
           </p>
         ) : (
           <p className="text-xs text-muted-foreground">Leave blank if this is already your take-home pay.</p>
@@ -84,50 +137,77 @@ function IncomeRow({
 }
 
 function IncomeSection() {
-  const { items, isLoading, add, remove, updateDeductionRate } = useIncomeSources();
+  const { items, isLoading, add, remove, update } = useIncomeSources();
   const [label, setLabel] = useState("");
   const [amount, setAmount] = useState(0);
+  const [frequency, setFrequency] = useState<IncomeFrequency>("monthly");
+  const [type, setType] = useState<IncomeType>("salary_wage");
   const [deductionRate, setDeductionRate] = useState<number | null>(null);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Income</CardTitle>
-        <CardDescription>Every source of income, normalized to monthly. Add an estimated tax/deduction % to factor in take-home pay instead of gross.</CardDescription>
+        <CardDescription>
+          Every source of income, normalized to monthly. Add an estimated tax/deduction % to factor in take-home pay
+          instead of gross.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {isLoading ? (
           <Skeleton className="h-16" />
         ) : (
           items.map((i) => (
-            <IncomeRow
-              key={i.id}
-              item={i}
-              onDelete={() => remove(i.id)}
-              onUpdateDeductionRate={(rate) => updateDeductionRate(i.id, rate)}
-            />
+            <IncomeRow key={i.id} item={i} onDelete={() => remove(i.id)} onUpdate={(updates) => update(i.id, updates)} />
           ))
         )}
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           <Input placeholder="Source" value={label} onChange={(e) => setLabel(e.target.value)} />
+          <Select value={type} onValueChange={(v) => setType(v as IncomeType)}>
+            <SelectTrigger className="w-full">
+              <SelectValue>{(value: string) => INCOME_TYPE_LABELS[value as keyof typeof INCOME_TYPE_LABELS]}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(INCOME_TYPE_LABELS).map(([value, l]) => (
+                <SelectItem key={value} value={value}>
+                  {l}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input type="number" placeholder="Amount" value={amount || ""} onChange={(e) => setAmount(Number(e.target.value))} />
+          <Select value={frequency} onValueChange={(v) => setFrequency(v as IncomeFrequency)}>
+            <SelectTrigger className="w-full">
+              <SelectValue>{(value: string) => INCOME_FREQUENCY_LABELS[value as keyof typeof INCOME_FREQUENCY_LABELS]}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(INCOME_FREQUENCY_LABELS).map(([value, l]) => (
+                <SelectItem key={value} value={value}>
+                  {l}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input
             type="number"
             placeholder="Tax % (optional)"
-            className="w-32"
             min={0}
             max={100}
             value={deductionRate ?? ""}
             onChange={(e) => setDeductionRate(e.target.value === "" ? null : Number(e.target.value))}
           />
+        </div>
+        <div className="flex justify-end">
           <Button
             type="button"
             variant="outline"
             onClick={() => {
               if (label && amount > 0) {
-                add(label, amount, "monthly", deductionRate);
+                add(label, amount, frequency, type, deductionRate);
                 setLabel("");
                 setAmount(0);
+                setFrequency("monthly");
+                setType("salary_wage");
                 setDeductionRate(null);
               }
             }}

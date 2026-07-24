@@ -9,7 +9,8 @@
 
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
-export type IncomeFrequency = "weekly" | "biweekly" | "monthly" | "annually";
+export type IncomeFrequency = "hourly" | "daily" | "weekly" | "biweekly" | "semi_monthly" | "monthly" | "annually";
+export type IncomeType = "salary_wage" | "commission" | "tips_bonuses" | "freelance" | "passive_income" | "other";
 export type ExpenseCategory =
   | "housing"
   | "transportation"
@@ -69,6 +70,7 @@ export interface Database {
           frequency: IncomeFrequency;
           is_primary: boolean;
           deduction_rate: number | null;
+          type: IncomeType;
           created_at: string;
           updated_at: string;
         };

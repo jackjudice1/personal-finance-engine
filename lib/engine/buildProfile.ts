@@ -31,6 +31,7 @@ export function buildFinancialProfile(raw: RawFinancialData): FinancialProfile {
     amount: Number(row.amount),
     frequency: row.frequency,
     isPrimary: row.is_primary,
+    type: row.type,
     deductionRate: row.deduction_rate == null ? null : Number(row.deduction_rate),
   }));
 

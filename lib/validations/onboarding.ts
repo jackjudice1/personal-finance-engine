@@ -3,7 +3,8 @@ import { z } from "zod";
 export const incomeEntrySchema = z.object({
   label: z.string().min(1, "Give this income a name"),
   amount: z.number().min(0, "Enter an amount"),
-  frequency: z.enum(["weekly", "biweekly", "monthly", "annually"]),
+  frequency: z.enum(["hourly", "daily", "weekly", "biweekly", "semi_monthly", "monthly", "annually"]),
+  type: z.enum(["salary_wage", "commission", "tips_bonuses", "freelance", "passive_income", "other"]),
   isPrimary: z.boolean(),
   deductionRate: z.number().min(0, "Can't be negative").max(100, "Can't exceed 100%").nullable(),
 });

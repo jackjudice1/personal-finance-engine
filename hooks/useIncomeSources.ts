@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useSupabaseUser } from "@/hooks/useSupabaseUser";
 import type { IncomeSource } from "@/types/financial";
-import type { IncomeFrequency } from "@/types/database.types";
+import type { IncomeFrequency, IncomeType } from "@/types/database.types";
 
 export function useIncomeSources() {
   const { user } = useSupabaseUser();
@@ -27,6 +27,7 @@ export function useIncomeSources() {
           amount: Number(r.amount),
           frequency: r.frequency,
           isPrimary: r.is_primary,
+          type: r.type,
           deductionRate: r.deduction_rate == null ? null : Number(r.deduction_rate),
         }))
       );
@@ -38,18 +39,36 @@ export function useIncomeSources() {
     };
   }, [user, tick]);
 
-  async function add(label: string, amount: number, frequency: IncomeFrequency, deductionRate: number | null = null) {
+  async function add(
+    label: string,
+    amount: number,
+    frequency: IncomeFrequency,
+    type: IncomeType,
+    deductionRate: number | null = null
+  ) {
     if (!user) return;
     const supabase = createClient();
     await supabase
       .from("income_sources")
-      .insert({ user_id: user.id, label, amount, frequency, is_primary: false, deduction_rate: deductionRate });
+      .insert({ user_id: user.id, label, amount, frequency, type, is_primary: false, deduction_rate: deductionRate });
     refetch();
   }
 
-  async function updateDeductionRate(id: string, deductionRate: number | null) {
+  async function update(
+    id: string,
+    updates: Partial<{ label: string; amount: number; frequency: IncomeFrequency; type: IncomeType; deductionRate: number | null }>
+  ) {
     const supabase = createClient();
-    await supabase.from("income_sources").update({ deduction_rate: deductionRate }).eq("id", id);
+    await supabase
+      .from("income_sources")
+      .update({
+        ...(updates.label !== undefined && { label: updates.label }),
+        ...(updates.amount !== undefined && { amount: updates.amount }),
+        ...(updates.frequency !== undefined && { frequency: updates.frequency }),
+        ...(updates.type !== undefined && { type: updates.type }),
+        ...(updates.deductionRate !== undefined && { deduction_rate: updates.deductionRate }),
+      })
+      .eq("id", id);
     refetch();
   }
 
@@ -59,5 +78,5 @@ export function useIncomeSources() {
     refetch();
   }
 
-  return { items, isLoading, add, remove, updateDeductionRate };
+  return { items, isLoading, add, update, remove };
 }

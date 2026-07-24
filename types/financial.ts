@@ -4,6 +4,7 @@ import type {
   GoalStatus,
   GoalType,
   IncomeFrequency,
+  IncomeType,
   LiabilityType,
 } from "@/types/database.types";
 
@@ -12,6 +13,7 @@ export interface IncomeSource {
   label: string;
   amount: number;
   frequency: IncomeFrequency;
+  type: IncomeType;
   isPrimary: boolean;
   /** Estimated percentage (0-100) taken out for taxes/deductions - null means `amount` is already the net/take-home figure. */
   deductionRate: number | null;
@@ -112,6 +114,36 @@ export const ASSET_TYPE_LABELS: Record<AssetType, string> = {
   other: "Other",
 };
 
+export const INCOME_FREQUENCY_LABELS: Record<IncomeFrequency, string> = {
+  hourly: "Hourly (40 hrs/week)",
+  daily: "Daily (5 days/week)",
+  weekly: "Weekly",
+  biweekly: "Biweekly",
+  semi_monthly: "Semi-monthly",
+  monthly: "Monthly",
+  annually: "Annually",
+};
+
+/** The unit shown in "≈ $X net per ___" previews - matches how the amount is entered, not always a calendar period. */
+export const INCOME_FREQUENCY_NOUN: Record<IncomeFrequency, string> = {
+  hourly: "hour",
+  daily: "day",
+  weekly: "week",
+  biweekly: "paycheck",
+  semi_monthly: "paycheck",
+  monthly: "month",
+  annually: "year",
+};
+
+export const INCOME_TYPE_LABELS: Record<IncomeType, string> = {
+  salary_wage: "Salary/Wage",
+  commission: "Commission",
+  tips_bonuses: "Tips/Bonuses",
+  freelance: "Freelance",
+  passive_income: "Passive Income",
+  other: "Other",
+};
+
 export const LIABILITY_TYPE_LABELS: Record<LiabilityType, string> = {
   credit_card: "Credit Card",
   student_loan: "Student Loan",
@@ -142,10 +174,19 @@ export function toNetAmount(amount: number, deductionRate: number | null): numbe
 /** Normalizes any income frequency to a monthly amount. */
 export function toMonthlyAmount(amount: number, frequency: IncomeFrequency): number {
   switch (frequency) {
+    case "hourly":
+      // Assumes a standard 40-hour work week - disclosed directly in the frequency picker's label.
+      return (amount * 40 * 52) / 12;
+    case "daily":
+      // Assumes a standard 5-day work week - disclosed directly in the frequency picker's label.
+      return (amount * 5 * 52) / 12;
     case "weekly":
       return (amount * 52) / 12;
     case "biweekly":
       return (amount * 26) / 12;
+    case "semi_monthly":
+      // Paid twice a month (e.g. the 1st and 15th) - exactly 24 payments/year, unlike biweekly's 26.
+      return amount * 2;
     case "monthly":
       return amount;
     case "annually":

@@ -6,16 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2, Wallet } from "lucide-react";
 import { useOnboarding } from "@/components/onboarding/OnboardingProvider";
 import { incomeStepSchema, type IncomeStepInput } from "@/lib/validations/onboarding";
-import { toNetAmount } from "@/types/financial";
+import { toNetAmount, INCOME_FREQUENCY_LABELS, INCOME_FREQUENCY_NOUN, INCOME_TYPE_LABELS } from "@/types/financial";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatCurrency } from "@/utils/formatters";
-
-const FREQUENCY_LABELS = { weekly: "Weekly", biweekly: "Biweekly", monthly: "Monthly", annually: "Annually" } as const;
-const FREQUENCY_NOUN = { weekly: "week", biweekly: "paycheck", monthly: "month", annually: "year" } as const;
 
 /** Live "≈ $X net per paycheck" readout - scoped with useWatch so typing in one row doesn't re-render the others. */
 function NetPreview({ control, index }: { control: Control<IncomeStepInput>; index: number }) {
@@ -30,7 +27,7 @@ function NetPreview({ control, index }: { control: Control<IncomeStepInput>; ind
   return (
     <p className="text-xs text-muted-foreground">
       ≈ <span className="font-medium text-foreground">{formatCurrency(toNetAmount(amount, deductionRate))}</span> net per{" "}
-      {FREQUENCY_NOUN[frequency]} after an estimated {deductionRate}% taken out.
+      {INCOME_FREQUENCY_NOUN[frequency]} after an estimated {deductionRate}% taken out.
     </p>
   );
 }
@@ -42,7 +39,9 @@ export function IncomeStepForm() {
   const { control, register, handleSubmit, formState: { errors } } = useForm<IncomeStepInput>({
     resolver: zodResolver(incomeStepSchema),
     defaultValues: draft.income ?? {
-      incomeSources: [{ label: "Salary", amount: 0, frequency: "monthly", isPrimary: true, deductionRate: null }],
+      incomeSources: [
+        { label: "Salary", amount: 0, frequency: "monthly", type: "salary_wage", isPrimary: true, deductionRate: null },
+      ],
     },
   });
 
@@ -67,10 +66,31 @@ export function IncomeStepForm() {
           <div className="space-y-4">
             {fields.map((field, index) => (
               <div key={field.id} className="space-y-3 rounded-xl border border-border/60 p-4">
-                <div className="grid grid-cols-[1fr_auto] gap-3 sm:grid-cols-[2fr_1fr_1fr_auto]">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-[1.4fr_1fr_1fr_1fr_auto]">
                   <div className="space-y-1.5">
                     <Label>Source</Label>
                     <Input placeholder="Salary" {...register(`incomeSources.${index}.label` as const)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Type</Label>
+                    <Controller
+                      control={control}
+                      name={`incomeSources.${index}.type` as const}
+                      render={({ field: f }) => (
+                        <Select value={f.value} onValueChange={f.onChange}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue>{(value: string) => INCOME_TYPE_LABELS[value as keyof typeof INCOME_TYPE_LABELS]}</SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.entries(INCOME_TYPE_LABELS).map(([value, label]) => (
+                              <SelectItem key={value} value={value}>
+                                {label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label>Amount</Label>
@@ -84,10 +104,10 @@ export function IncomeStepForm() {
                       render={({ field: f }) => (
                         <Select value={f.value} onValueChange={f.onChange}>
                           <SelectTrigger className="w-full">
-                            <SelectValue>{(value: string) => FREQUENCY_LABELS[value as keyof typeof FREQUENCY_LABELS]}</SelectValue>
+                            <SelectValue>{(value: string) => INCOME_FREQUENCY_LABELS[value as keyof typeof INCOME_FREQUENCY_LABELS]}</SelectValue>
                           </SelectTrigger>
                           <SelectContent>
-                            {Object.entries(FREQUENCY_LABELS).map(([value, label]) => (
+                            {Object.entries(INCOME_FREQUENCY_LABELS).map(([value, label]) => (
                               <SelectItem key={value} value={value}>
                                 {label}
                               </SelectItem>
@@ -97,7 +117,7 @@ export function IncomeStepForm() {
                       )}
                     />
                   </div>
-                  <div className="flex items-end justify-end sm:col-start-4">
+                  <div className="col-span-2 flex items-end justify-end sm:col-span-1">
                     <Button
                       type="button"
                       variant="ghost"
@@ -140,7 +160,9 @@ export function IncomeStepForm() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => append({ label: "", amount: 0, frequency: "monthly", isPrimary: false, deductionRate: null })}
+            onClick={() =>
+              append({ label: "", amount: 0, frequency: "monthly", type: "salary_wage", isPrimary: false, deductionRate: null })
+            }
           >
             <Plus className="size-4" />
             Add another income source

@@ -40,6 +40,7 @@ export async function POST(request: Request) {
     label: s.label,
     amount: s.amount,
     frequency: s.frequency,
+    type: s.type,
     is_primary: s.isPrimary,
     deduction_rate: s.deductionRate,
   }));

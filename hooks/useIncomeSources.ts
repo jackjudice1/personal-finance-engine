@@ -27,6 +27,7 @@ export function useIncomeSources() {
           amount: Number(r.amount),
           frequency: r.frequency,
           isPrimary: r.is_primary,
+          deductionRate: r.deduction_rate == null ? null : Number(r.deduction_rate),
         }))
       );
       setIsLoading(false);
@@ -37,10 +38,18 @@ export function useIncomeSources() {
     };
   }, [user, tick]);
 
-  async function add(label: string, amount: number, frequency: IncomeFrequency) {
+  async function add(label: string, amount: number, frequency: IncomeFrequency, deductionRate: number | null = null) {
     if (!user) return;
     const supabase = createClient();
-    await supabase.from("income_sources").insert({ user_id: user.id, label, amount, frequency, is_primary: false });
+    await supabase
+      .from("income_sources")
+      .insert({ user_id: user.id, label, amount, frequency, is_primary: false, deduction_rate: deductionRate });
+    refetch();
+  }
+
+  async function updateDeductionRate(id: string, deductionRate: number | null) {
+    const supabase = createClient();
+    await supabase.from("income_sources").update({ deduction_rate: deductionRate }).eq("id", id);
     refetch();
   }
 
@@ -50,5 +59,5 @@ export function useIncomeSources() {
     refetch();
   }
 
-  return { items, isLoading, add, remove };
+  return { items, isLoading, add, remove, updateDeductionRate };
 }

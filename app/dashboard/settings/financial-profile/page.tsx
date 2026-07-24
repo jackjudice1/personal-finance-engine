@@ -6,10 +6,12 @@ import { ArrowRight, Trash2 } from "lucide-react";
 import { useIncomeSources } from "@/hooks/useIncomeSources";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useAssets } from "@/hooks/useAssets";
-import { EXPENSE_CATEGORY_LABELS, ASSET_TYPE_LABELS } from "@/types/financial";
+import { EXPENSE_CATEGORY_LABELS, ASSET_TYPE_LABELS, toNetAmount } from "@/types/financial";
+import type { IncomeSource } from "@/types/financial";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/utils/formatters";
@@ -28,36 +30,105 @@ function Row({ label, sub, onDelete }: { label: string; sub: string; onDelete: (
   );
 }
 
+function IncomeRow({
+  item,
+  onUpdateDeductionRate,
+  onDelete,
+}: {
+  item: IncomeSource;
+  onUpdateDeductionRate: (rate: number | null) => void;
+  onDelete: () => void;
+}) {
+  const [rate, setRate] = useState<number | null>(item.deductionRate);
+
+  return (
+    <div className="space-y-2 rounded-lg border border-border/60 p-3 text-sm">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="font-medium">{item.label}</p>
+          <p className="text-xs text-muted-foreground">
+            {formatCurrency(item.amount)} / {item.frequency}
+          </p>
+        </div>
+        <Button variant="ghost" size="icon-sm" onClick={onDelete} aria-label="Remove">
+          <Trash2 className="size-3.5" />
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <Label htmlFor={`deduction-${item.id}`} className="shrink-0 text-xs text-muted-foreground">
+          Est. tax/deductions %
+        </Label>
+        <Input
+          id={`deduction-${item.id}`}
+          type="number"
+          step="1"
+          min={0}
+          max={100}
+          placeholder="Optional"
+          className="w-24"
+          value={rate ?? ""}
+          onChange={(e) => setRate(e.target.value === "" ? null : Number(e.target.value))}
+          onBlur={() => onUpdateDeductionRate(rate)}
+        />
+        {rate ? (
+          <p className="text-xs text-muted-foreground">
+            ≈ <span className="font-medium text-foreground">{formatCurrency(toNetAmount(item.amount, rate))}</span> net /{" "}
+            {item.frequency}
+          </p>
+        ) : (
+          <p className="text-xs text-muted-foreground">Leave blank if this is already your take-home pay.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function IncomeSection() {
-  const { items, isLoading, add, remove } = useIncomeSources();
+  const { items, isLoading, add, remove, updateDeductionRate } = useIncomeSources();
   const [label, setLabel] = useState("");
   const [amount, setAmount] = useState(0);
+  const [deductionRate, setDeductionRate] = useState<number | null>(null);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Income</CardTitle>
-        <CardDescription>Every source of income, normalized to monthly.</CardDescription>
+        <CardDescription>Every source of income, normalized to monthly. Add an estimated tax/deduction % to factor in take-home pay instead of gross.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {isLoading ? (
           <Skeleton className="h-16" />
         ) : (
           items.map((i) => (
-            <Row key={i.id} label={i.label} sub={`${formatCurrency(i.amount)} / ${i.frequency}`} onDelete={() => remove(i.id)} />
+            <IncomeRow
+              key={i.id}
+              item={i}
+              onDelete={() => remove(i.id)}
+              onUpdateDeductionRate={(rate) => updateDeductionRate(i.id, rate)}
+            />
           ))
         )}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Input placeholder="Source" value={label} onChange={(e) => setLabel(e.target.value)} />
           <Input type="number" placeholder="Amount" value={amount || ""} onChange={(e) => setAmount(Number(e.target.value))} />
+          <Input
+            type="number"
+            placeholder="Tax % (optional)"
+            className="w-32"
+            min={0}
+            max={100}
+            value={deductionRate ?? ""}
+            onChange={(e) => setDeductionRate(e.target.value === "" ? null : Number(e.target.value))}
+          />
           <Button
             type="button"
             variant="outline"
             onClick={() => {
               if (label && amount > 0) {
-                add(label, amount, "monthly");
+                add(label, amount, "monthly", deductionRate);
                 setLabel("");
                 setAmount(0);
+                setDeductionRate(null);
               }
             }}
           >

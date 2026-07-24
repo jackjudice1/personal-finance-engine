@@ -13,6 +13,8 @@ export interface IncomeSource {
   amount: number;
   frequency: IncomeFrequency;
   isPrimary: boolean;
+  /** Estimated percentage (0-100) taken out for taxes/deductions - null means `amount` is already the net/take-home figure. */
+  deductionRate: number | null;
 }
 
 export interface Expense {
@@ -130,6 +132,12 @@ export const GOAL_TYPE_LABELS: Record<GoalType, string> = {
   business: "Start a Business",
   custom: "Custom Goal",
 };
+
+/** Applies an income source's estimated deduction rate, if set - otherwise returns the amount unchanged (already net). */
+export function toNetAmount(amount: number, deductionRate: number | null): number {
+  if (!deductionRate) return amount;
+  return amount * (1 - deductionRate / 100);
+}
 
 /** Normalizes any income frequency to a monthly amount. */
 export function toMonthlyAmount(amount: number, frequency: IncomeFrequency): number {

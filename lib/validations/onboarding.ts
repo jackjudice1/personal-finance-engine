@@ -5,6 +5,7 @@ export const incomeEntrySchema = z.object({
   amount: z.number().min(0, "Enter an amount"),
   frequency: z.enum(["weekly", "biweekly", "monthly", "annually"]),
   isPrimary: z.boolean(),
+  deductionRate: z.number().min(0, "Can't be negative").max(100, "Can't exceed 100%").nullable(),
 });
 export const incomeStepSchema = z.object({
   incomeSources: z.array(incomeEntrySchema).min(1, "Add at least one income source"),

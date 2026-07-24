@@ -1,6 +1,6 @@
 import type { Database } from "@/types/database.types";
 import type { Asset, Expense, FinancialProfile, Goal, IncomeSource, Liability, StockHolding } from "@/types/financial";
-import { toMonthlyAmount } from "@/types/financial";
+import { toMonthlyAmount, toNetAmount } from "@/types/financial";
 
 type IncomeRow = Database["public"]["Tables"]["income_sources"]["Row"];
 type ExpenseRow = Database["public"]["Tables"]["expenses"]["Row"];
@@ -31,6 +31,7 @@ export function buildFinancialProfile(raw: RawFinancialData): FinancialProfile {
     amount: Number(row.amount),
     frequency: row.frequency,
     isPrimary: row.is_primary,
+    deductionRate: row.deduction_rate == null ? null : Number(row.deduction_rate),
   }));
 
   const expenses: Expense[] = raw.expenses.map((row) => ({
@@ -81,7 +82,10 @@ export function buildFinancialProfile(raw: RawFinancialData): FinancialProfile {
     lastPriceFetchedAt: row.last_price_fetched_at,
   }));
 
-  const monthlyIncome = incomeSources.reduce((sum, s) => sum + toMonthlyAmount(s.amount, s.frequency), 0);
+  const monthlyIncome = incomeSources.reduce(
+    (sum, s) => sum + toMonthlyAmount(toNetAmount(s.amount, s.deductionRate), s.frequency),
+    0
+  );
   const monthlyExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
 
   const expensesByCategory = expenses.reduce(

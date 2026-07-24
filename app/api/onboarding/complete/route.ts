@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     amount: s.amount,
     frequency: s.frequency,
     is_primary: s.isPrimary,
+    deduction_rate: s.deductionRate,
   }));
 
   const expenseRows = Object.entries(expenses.expenses)

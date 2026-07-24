@@ -68,6 +68,7 @@ export interface Database {
           amount: number;
           frequency: IncomeFrequency;
           is_primary: boolean;
+          deduction_rate: number | null;
           created_at: string;
           updated_at: string;
         };

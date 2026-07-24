@@ -32,13 +32,15 @@ export function useExpenses() {
   async function add(category: ExpenseCategory, amount: number, label?: string) {
     if (!user) return;
     const supabase = createClient();
-    await supabase.from("expenses").insert({ user_id: user.id, category, amount, label: label ?? null });
+    const { error } = await supabase.from("expenses").insert({ user_id: user.id, category, amount, label: label ?? null });
+    if (error) throw new Error(error.message);
     refetch();
   }
 
   async function remove(id: string) {
     const supabase = createClient();
-    await supabase.from("expenses").delete().eq("id", id);
+    const { error } = await supabase.from("expenses").delete().eq("id", id);
+    if (error) throw new Error(error.message);
     refetch();
   }
 

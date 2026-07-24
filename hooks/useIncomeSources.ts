@@ -48,9 +48,10 @@ export function useIncomeSources() {
   ) {
     if (!user) return;
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("income_sources")
       .insert({ user_id: user.id, label, amount, frequency, type, is_primary: false, deduction_rate: deductionRate });
+    if (error) throw new Error(error.message);
     refetch();
   }
 
@@ -59,7 +60,7 @@ export function useIncomeSources() {
     updates: Partial<{ label: string; amount: number; frequency: IncomeFrequency; type: IncomeType; deductionRate: number | null }>
   ) {
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("income_sources")
       .update({
         ...(updates.label !== undefined && { label: updates.label }),
@@ -69,12 +70,14 @@ export function useIncomeSources() {
         ...(updates.deductionRate !== undefined && { deduction_rate: updates.deductionRate }),
       })
       .eq("id", id);
+    if (error) throw new Error(error.message);
     refetch();
   }
 
   async function remove(id: string) {
     const supabase = createClient();
-    await supabase.from("income_sources").delete().eq("id", id);
+    const { error } = await supabase.from("income_sources").delete().eq("id", id);
+    if (error) throw new Error(error.message);
     refetch();
   }
 

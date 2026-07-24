@@ -41,13 +41,17 @@ export function useAssets() {
   async function add(type: AssetType, label: string, balance: number, isEmergencyFund: boolean) {
     if (!user) return;
     const supabase = createClient();
-    await supabase.from("assets").insert({ user_id: user.id, type, label, balance, is_emergency_fund: isEmergencyFund });
+    const { error } = await supabase
+      .from("assets")
+      .insert({ user_id: user.id, type, label, balance, is_emergency_fund: isEmergencyFund });
+    if (error) throw new Error(error.message);
     refetch();
   }
 
   async function remove(id: string) {
     const supabase = createClient();
-    await supabase.from("assets").delete().eq("id", id);
+    const { error } = await supabase.from("assets").delete().eq("id", id);
+    if (error) throw new Error(error.message);
     refetch();
   }
 

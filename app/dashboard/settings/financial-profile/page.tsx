@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { ArrowRight, Trash2 } from "lucide-react";
 import { useIncomeSources } from "@/hooks/useIncomeSources";
 import { useExpenses } from "@/hooks/useExpenses";
@@ -158,7 +159,14 @@ function IncomeSection() {
           <Skeleton className="h-16" />
         ) : (
           items.map((i) => (
-            <IncomeRow key={i.id} item={i} onDelete={() => remove(i.id)} onUpdate={(updates) => update(i.id, updates)} />
+            <IncomeRow
+              key={i.id}
+              item={i}
+              onDelete={() => remove(i.id).catch(() => toast.error("Couldn't remove this income source. Please try again."))}
+              onUpdate={(updates) =>
+                update(i.id, updates).catch(() => toast.error("Couldn't save that change. Please try again."))
+              }
+            />
           ))
         )}
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -201,14 +209,17 @@ function IncomeSection() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => {
-              if (label && amount > 0) {
-                add(label, amount, frequency, type, deductionRate);
+            onClick={async () => {
+              if (!label || amount <= 0) return;
+              try {
+                await add(label, amount, frequency, type, deductionRate);
                 setLabel("");
                 setAmount(0);
                 setFrequency("monthly");
                 setType("salary_wage");
                 setDeductionRate(null);
+              } catch {
+                toast.error("Couldn't add this income source. Please try again.");
               }
             }}
           >
@@ -240,7 +251,7 @@ function ExpensesSection() {
               key={e.id}
               label={EXPENSE_CATEGORY_LABELS[e.category]}
               sub={formatCurrency(e.amount)}
-              onDelete={() => remove(e.id)}
+              onDelete={() => remove(e.id).catch(() => toast.error("Couldn't remove this expense. Please try again."))}
             />
           ))
         )}
@@ -263,10 +274,13 @@ function ExpensesSection() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => {
-              if (amount > 0) {
-                add(category, amount);
+            onClick={async () => {
+              if (amount <= 0) return;
+              try {
+                await add(category, amount);
                 setAmount(0);
+              } catch {
+                toast.error("Couldn't add this expense. Please try again.");
               }
             }}
           >
@@ -299,7 +313,7 @@ function AssetsSection() {
               key={a.id}
               label={a.label}
               sub={`${formatCurrency(a.balance)}${a.isEmergencyFund ? " • Emergency fund" : ""}`}
-              onDelete={() => remove(a.id)}
+              onDelete={() => remove(a.id).catch(() => toast.error("Couldn't remove this asset. Please try again."))}
             />
           ))
         )}
@@ -321,11 +335,14 @@ function AssetsSection() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => {
-              if (label && balance >= 0) {
-                add(type, label, balance, false);
+            onClick={async () => {
+              if (!label || balance < 0) return;
+              try {
+                await add(type, label, balance, false);
                 setLabel("");
                 setBalance(0);
+              } catch {
+                toast.error("Couldn't add this asset. Please try again.");
               }
             }}
           >

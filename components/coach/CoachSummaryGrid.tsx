@@ -9,7 +9,7 @@ import { formatCurrency, formatPercent } from "@/utils/formatters";
 
 export function CoachSummaryGrid({ profile, health }: { profile: FinancialProfile; health: HealthScoreBreakdown }) {
   const netWorth = calculateNetWorth(profile);
-  const monthlyCashFlow = profile.monthlyIncome - profile.monthlyExpenses;
+  const monthlyCashFlow = profile.monthlyIncome - profile.monthlyExpenses - profile.totalMinimumPayments;
   const topGoal = [...profile.goals].sort((a, b) => a.priority - b.priority)[0];
   const topGoalProjection = topGoal ? projectGoal(topGoal) : null;
 

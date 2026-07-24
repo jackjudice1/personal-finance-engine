@@ -114,9 +114,13 @@ export function buildFinancialProfile(raw: RawFinancialData): FinancialProfile {
   const emergencyFundBalance = assets.filter((a) => a.isEmergencyFund).reduce((sum, a) => sum + a.balance, 0);
 
   const totalLiabilities = liabilities.reduce((sum, l) => sum + l.balance, 0);
-  const totalMinimumPayments = liabilities.reduce((sum, l) => sum + l.minimumPayment, 0);
+  // Only debts still being paid down count against monthly cash flow - a
+  // paid-off debt's stored minimum payment isn't actually coming out of
+  // anyone's pocket anymore.
+  const totalMinimumPayments = liabilities.filter((l) => l.balance > 0).reduce((sum, l) => sum + l.minimumPayment, 0);
 
-  const savingsRate = monthlyIncome > 0 ? Math.max(0, (monthlyIncome - monthlyExpenses) / monthlyIncome) : 0;
+  const savingsRate =
+    monthlyIncome > 0 ? Math.max(0, (monthlyIncome - monthlyExpenses - totalMinimumPayments) / monthlyIncome) : 0;
 
   return {
     userId: raw.userId,

@@ -21,7 +21,7 @@ export function MoneySnapshotGrid({ profile }: { profile: FinancialProfile }) {
       icon: TrendingUp,
       label: "Savings Rate",
       value: formatPercent(profile.savingsRate),
-      description: "(Income − Expenses) ÷ Income. The share of what you earn that you're not spending. A very high rate usually means either low expenses or income that's higher than what you actually take home — worth double-checking your entered numbers if this looks off.",
+      description: "(Income − Expenses − Debt Payments) ÷ Income. The share of what you earn that you're not spending or paying toward debt. A very high rate usually means either low expenses or income that's higher than what you actually take home — worth double-checking your entered numbers if this looks off.",
     },
     {
       icon: Banknote,

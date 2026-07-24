@@ -259,7 +259,7 @@ export function answerCoachQuestion(
   }
 
   if (isSavingsAdviceQuestion(q)) {
-    const currentSurplus = profile.monthlyIncome - profile.monthlyExpenses;
+    const currentSurplus = profile.monthlyIncome - profile.monthlyExpenses - profile.totalMinimumPayments;
     const explicitTarget = extractDollarAmount(q);
     let content: string;
     if (explicitTarget) {

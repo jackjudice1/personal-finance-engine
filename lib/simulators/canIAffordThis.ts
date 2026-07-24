@@ -12,7 +12,7 @@ export function canIAffordThis(input: CanIAffordThisInput, profile: FinancialPro
     .filter((a) => a.type === "savings" || a.type === "checking")
     .reduce((sum, a) => sum + a.balance, 0);
 
-  const newSurplus = profile.monthlyIncome - profile.monthlyExpenses - monthlyPayment;
+  const newSurplus = profile.monthlyIncome - profile.monthlyExpenses - profile.totalMinimumPayments - monthlyPayment;
   const newSavingsRate = profile.monthlyIncome > 0 ? newSurplus / profile.monthlyIncome : 0;
 
   const canCoverDownPayment = downPayment <= liquidAssets;

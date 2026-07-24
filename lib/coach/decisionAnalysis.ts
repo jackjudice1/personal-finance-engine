@@ -21,7 +21,10 @@ const OPPORTUNITY_COST_HORIZON_YEARS = 10;
 /** Returns a shallow-cloned profile with an added recurring monthly expense, keeping savingsRate consistent for a "what would my score be after this" comparison. */
 function withAddedMonthlyExpense(profile: FinancialProfile, amount: number): FinancialProfile {
   const monthlyExpenses = profile.monthlyExpenses + amount;
-  const savingsRate = profile.monthlyIncome > 0 ? (profile.monthlyIncome - monthlyExpenses) / profile.monthlyIncome : 0;
+  const savingsRate =
+    profile.monthlyIncome > 0
+      ? (profile.monthlyIncome - monthlyExpenses - profile.totalMinimumPayments) / profile.monthlyIncome
+      : 0;
   return { ...profile, monthlyExpenses, savingsRate };
 }
 

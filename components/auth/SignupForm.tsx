@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { signupSchema, type SignupInput } from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 
 export function SignupForm() {
@@ -52,12 +53,12 @@ export function SignupForm() {
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="password">Password</Label>
-        <Input id="password" type="password" autoComplete="new-password" {...register("password")} />
+        <PasswordInput id="password" autoComplete="new-password" {...register("password")} />
         {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="confirmPassword">Confirm password</Label>
-        <Input id="confirmPassword" type="password" autoComplete="new-password" {...register("confirmPassword")} />
+        <PasswordInput id="confirmPassword" autoComplete="new-password" {...register("confirmPassword")} />
         {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>}
       </div>
       {serverError && <p className="text-sm text-destructive">{serverError}</p>}

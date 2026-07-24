@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 
 export function LoginForm() {
@@ -49,7 +50,7 @@ export function LoginForm() {
             Forgot password?
           </a>
         </div>
-        <Input id="password" type="password" autoComplete="current-password" {...register("password")} />
+        <PasswordInput id="password" autoComplete="current-password" {...register("password")} />
         {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
       </div>
       {serverError && <p className="text-sm text-destructive">{serverError}</p>}

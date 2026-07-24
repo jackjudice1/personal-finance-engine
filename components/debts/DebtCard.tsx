@@ -72,9 +72,15 @@ export function DebtCard({ debt, projection }: { debt: Liability; projection: De
                 {projection.monthsRemaining !== null ? `${projection.monthsRemaining} mo remaining` : "Won't pay off"}
               </span>
               <span>{formatCurrency(projection.interestPaidToDate)} interest paid</span>
-              <span className="text-right">{formatCurrency(projection.interestRemaining)} interest left</span>
-              {projection.payoffDate && (
+              <span className="text-right">
+                {projection.monthsRemaining !== null ? `${formatCurrency(projection.interestRemaining)} interest left` : "—"}
+              </span>
+              {projection.payoffDate ? (
                 <span className="col-span-2">Est. payoff: {formatDate(projection.payoffDate)}</span>
+              ) : (
+                <span className="col-span-2 text-destructive">
+                  Minimum payment doesn&apos;t cover monthly interest — balance will keep growing.
+                </span>
               )}
             </div>
           )}

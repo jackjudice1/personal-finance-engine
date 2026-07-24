@@ -1,4 +1,4 @@
-import { Flame, Target, TrendingDown, Trophy } from "lucide-react";
+import { AlertTriangle, Flame, Target, TrendingDown, Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { projectDebtFreedom } from "@/lib/simulators/debtPayoff";
 import type { Liability } from "@/types/financial";
@@ -24,6 +24,16 @@ export function DebtInsights({
   customOrder: string[];
 }) {
   const insights: Insight[] = [];
+
+  const underwaterDebts = debts.filter(
+    (d) => d.balance > 0 && d.minimumPayment <= d.balance * (d.interestRate / 100 / 12)
+  );
+  for (const debt of underwaterDebts) {
+    insights.push({
+      icon: AlertTriangle,
+      text: `Your ${debt.label}'s minimum payment doesn't cover its monthly interest — the balance will keep growing until you pay more than ${formatCurrency(Math.ceil(debt.balance * (debt.interestRate / 100 / 12)))}/mo.`,
+    });
+  }
 
   const paidOffCount = debts.filter((d) => d.balance === 0).length;
   if (paidOffCount > 0) {

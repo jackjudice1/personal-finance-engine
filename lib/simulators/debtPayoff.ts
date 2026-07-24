@@ -130,7 +130,10 @@ export function projectDebtFreedom(
     debtFreeDate: anyUnpaid ? null : addMonths(today, month),
     totalMonthsRemaining: anyUnpaid ? null : month,
     totalBalanceRemaining,
-    totalInterestRemaining: Math.round(perDebt.reduce((sum, p) => sum + p.interestRemaining, 0) * 100) / 100,
+    // Debts that never pay off within MAX_MONTHS accrue interest on an ever-growing balance - that
+    // figure is a simulation-cap artifact, not a real projection, so it's excluded from the total.
+    totalInterestRemaining:
+      Math.round(perDebt.reduce((sum, p) => sum + (p.monthsRemaining !== null ? p.interestRemaining : 0), 0) * 100) / 100,
     totalMonthlyPayments: debts.reduce((sum, d) => sum + d.minimumPayment, 0) + extraMonthlyPayment,
     overallProgressPercent: totalOriginal > 0 ? Math.min(100, Math.max(0, (totalEliminated / totalOriginal) * 100)) : 100,
     totalEliminated,

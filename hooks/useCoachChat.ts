@@ -84,9 +84,14 @@ export function useCoachChat(personality: FinancialPersonality) {
     }
   }
 
+  function clearChat() {
+    setMessages([GREETING]);
+    setPendingReveal(null);
+  }
+
   const revealingMessage: ChatMessage | null = pendingReveal
     ? { ...pendingReveal.fullMessage, content: pendingReveal.fullMessage.content.slice(0, pendingReveal.revealedChars), category: undefined, decisionAnalysis: undefined, whatIfScenario: undefined, followUps: undefined }
     : null;
 
-  return { messages, isSending, revealingMessage, send };
+  return { messages, isSending, revealingMessage, send, clearChat };
 }

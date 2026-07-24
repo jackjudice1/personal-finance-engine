@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Loader2, Send } from "lucide-react";
+import { Loader2, RotateCcw, Send } from "lucide-react";
 import type { FinancialProfile } from "@/types/financial";
 import type { HealthScoreBreakdown } from "@/types/engine";
 import { useCoachChat } from "@/hooks/useCoachChat";
@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 
 export function CoachChatWindow({ profile, health }: { profile: FinancialProfile; health: HealthScoreBreakdown }) {
   const { mode } = usePersonalityMode();
-  const { messages, isSending, revealingMessage, send } = useCoachChat(mode);
+  const { messages, isSending, revealingMessage, send, clearChat } = useCoachChat(mode);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -31,6 +31,21 @@ export function CoachChatWindow({ profile, health }: { profile: FinancialProfile
       {showIntro && <CoachSummaryGrid profile={profile} health={health} />}
 
       <div className="flex h-[calc(100vh-20rem)] min-h-[28rem] max-w-2xl flex-col rounded-xl border border-border/60 bg-card">
+        <div className="flex items-center justify-between border-b border-border/60 px-4 py-2.5">
+          <p className="text-sm font-medium">Chat</p>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              clearChat();
+              setInput("");
+            }}
+            disabled={messages.length <= 1 && !revealingMessage}
+          >
+            <RotateCcw className="size-3.5" />
+            New chat
+          </Button>
+        </div>
         <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
           {messages.map((message) => (
             <CoachMessageBubble key={message.id} message={message} profile={profile} onSelectFollowUp={handleSend} />

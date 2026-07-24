@@ -45,7 +45,17 @@ export default function DebtsPage() {
 
   const summary = useDebtProjection(effectiveDebts, strategy, effectiveExtraPayment, effectiveCustomOrder, debts);
   const projectionByDebtId = new Map(summary?.perDebt.map((p) => [p.debtId, p]) ?? []);
-  const activeDebts = debts.filter((d) => d.balance > 0);
+
+  function byPayoffOrder(a: typeof debts[number], b: typeof debts[number]) {
+    const aMonths = projectionByDebtId.get(a.id)?.monthsRemaining ?? null;
+    const bMonths = projectionByDebtId.get(b.id)?.monthsRemaining ?? null;
+    if (aMonths === null && bMonths === null) return 0;
+    if (aMonths === null) return 1;
+    if (bMonths === null) return -1;
+    return aMonths - bMonths;
+  }
+
+  const activeDebts = debts.filter((d) => d.balance > 0).sort(byPayoffOrder);
   const paidOffDebts = debts.filter((d) => d.balance === 0);
   const debtDestroyerUnlock = newlyUnlocked.filter((a) => a.key === "debt_destroyer");
 

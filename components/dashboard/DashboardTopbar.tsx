@@ -8,6 +8,7 @@ import { useSupabaseUser } from "@/hooks/useSupabaseUser";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { SummoraLogo } from "@/components/shared/SummoraLogo";
+import { MobileNav } from "@/components/dashboard/MobileNav";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,7 +40,8 @@ export function DashboardTopbar() {
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border/60 px-4 sm:px-6">
-      <div className="flex items-center lg:hidden">
+      <div className="flex items-center gap-2 lg:hidden">
+        <MobileNav />
         <SummoraLogo className="h-6 w-auto" />
       </div>
       <div className="ml-auto flex items-center gap-2">

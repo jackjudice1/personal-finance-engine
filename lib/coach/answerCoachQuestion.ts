@@ -10,7 +10,6 @@ import { detectWhatIfScenario } from "@/lib/coach/whatIfScenarios";
 import { buildDecisionAnalysis, type PurchaseType } from "@/lib/coach/decisionAnalysis";
 import { getFollowUps } from "@/lib/coach/followUps";
 import { extractDollarAmount, extractMonthlyPayment } from "@/lib/coach/extract";
-import { PERSONALITY_MODES } from "@/lib/constants/personalityModes";
 import { EXPENSE_CATEGORY_LABELS } from "@/types/financial";
 import { formatCurrency, formatPercent } from "@/utils/formatters";
 
@@ -54,16 +53,11 @@ function extractPurchaseLabel(question: string, fallback: string): string {
   return captured && captured.length > 1 && captured.length < 40 ? captured : fallback;
 }
 
-/** Prepends a "coach" personality encouragement line, or trims to the first sentence for "minimal" - "analyst" gets the full text as-is. */
+/** Trims to the first sentence for "minimal" - "coach" and "analyst" get the full text as-is, answering the question directly. */
 function applyPersonalityTone(content: string, personality: FinancialPersonality): string {
   if (personality === "minimal") {
     const firstSentence = content.split(/(?<=[.!?])\s/)[0];
     return firstSentence ?? content;
-  }
-  if (personality === "coach") {
-    const encouragement = PERSONALITY_MODES.coach.encouragement;
-    const prefix = encouragement[Math.floor(Math.random() * encouragement.length)];
-    return `${prefix} ${content}`;
   }
   return content;
 }

@@ -78,10 +78,12 @@ export function GoalForm({
         <div className="space-y-1.5">
           <Label>Current amount</Label>
           <Input type="number" step="1" {...register("currentAmount", { valueAsNumber: true })} />
+          {errors.currentAmount && <p className="text-xs text-destructive">{errors.currentAmount.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label>Monthly contribution</Label>
           <Input type="number" step="1" {...register("monthlyContribution", { valueAsNumber: true })} />
+          {errors.monthlyContribution && <p className="text-xs text-destructive">{errors.monthlyContribution.message}</p>}
         </div>
       </div>
 

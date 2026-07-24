@@ -66,7 +66,7 @@ export function useGoals() {
   async function createGoal(input: GoalFormInput) {
     if (!user) return;
     const supabase = createClient();
-    await supabase.from("goals").insert({
+    const { error } = await supabase.from("goals").insert({
       user_id: user.id,
       type: input.type,
       title: input.title,
@@ -76,12 +76,13 @@ export function useGoals() {
       monthly_contribution: input.monthlyContribution,
       priority: input.priority,
     });
+    if (error) throw new Error(error.message);
     refetch();
   }
 
   async function updateGoal(goalId: string, input: GoalFormInput) {
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("goals")
       .update({
         type: input.type,
@@ -93,12 +94,14 @@ export function useGoals() {
         priority: input.priority,
       })
       .eq("id", goalId);
+    if (error) throw new Error(error.message);
     refetch();
   }
 
   async function deleteGoal(goalId: string) {
     const supabase = createClient();
-    await supabase.from("goals").delete().eq("id", goalId);
+    const { error } = await supabase.from("goals").delete().eq("id", goalId);
+    if (error) throw new Error(error.message);
     refetch();
   }
 

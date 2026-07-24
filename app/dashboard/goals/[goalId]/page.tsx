@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useGoals } from "@/hooks/useGoals";
 import { GoalDetailPanel } from "@/components/goals/GoalDetailPanel";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,12 +23,20 @@ export default function GoalDetailPage() {
   }
 
   async function handleUpdate(values: GoalFormInput) {
-    await updateGoal(goal!.id, values);
-    router.push("/dashboard/goals");
+    try {
+      await updateGoal(goal!.id, values);
+      router.push("/dashboard/goals");
+    } catch {
+      toast.error("Couldn't save changes to this goal. Please try again.");
+    }
   }
 
   async function handleDelete() {
-    await deleteGoal(goal!.id);
+    try {
+      await deleteGoal(goal!.id);
+    } catch {
+      toast.error("Couldn't delete this goal. Please try again.");
+    }
   }
 
   return <GoalDetailPanel goal={goal} onUpdate={handleUpdate} onDelete={handleDelete} />;

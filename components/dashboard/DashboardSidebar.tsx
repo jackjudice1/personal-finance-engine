@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { SummoraLogo } from "@/components/shared/SummoraLogo";
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/goals", label: "Goals", icon: Target },
   { href: "/dashboard/debts", label: "Debts", icon: CreditCard },
